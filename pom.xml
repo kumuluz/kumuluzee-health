@@ -12,7 +12,7 @@
 
     <inceptionYear>2017</inceptionYear>
     <description>
-        KumuluzEE CORS extension for handling Cross-Origin Resource Sharing (CORS), which makes cross-origin AJAX possible.
+        KumuluzEE Health extension provides you with a consistent, unified way of performing microservice health checks.
     </description>
 
     <url>https://ee.kumuluz.com</url>
@@ -37,7 +37,7 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/kumuluz/kumuluzee-cors/issues</url>
+        <url>https://github.com/kumuluz/kumuluzee-health/issues</url>
     </issueManagement>
 
     <developers>
