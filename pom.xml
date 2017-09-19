@@ -29,6 +29,12 @@
         <gpg.plugin.version>1.6</gpg.plugin.version>
     </properties>
 
+    <scm>
+        <connection>scm:git:git@github.com:kumuluz/kumuluzee-health.git</connection>
+        <developerConnection>scm:git:git@github.com:kumuluz/kumuluzee-health.git</developerConnection>
+        <url>git@github.com:kumuluz/kumuluzee-health.git</url>
+    </scm>
+
     <issueManagement>
         <system>GitHub Issues</system>
         <url>https://github.com/kumuluz/kumuluzee-cors/issues</url>
