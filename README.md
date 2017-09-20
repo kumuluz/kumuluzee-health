@@ -163,7 +163,7 @@ The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pre
 {"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
 ```
 
-## Configuring health checks
+## Configuring health check endpoint
 
 The provide access to health check via URL, the health servlet is registered automatically on path `/health`. However, custom servlet mapping can be specified by providing servlet mapping location in the configuration.
 
@@ -176,7 +176,7 @@ kumuluzee:
       mapping: /health
 ```
 
-## Configuration of built-in health checks
+## Configuring built-in health checks
 
 To configure built-in health checks, we can use the configuration parameters listed below for each built-in health check.
 
