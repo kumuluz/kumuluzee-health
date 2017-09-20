@@ -4,7 +4,9 @@
 > KumuluzEE Health extension provides consistent, unified way of performing microservice health checks and exposing health information.
 
 KumuluzEE Health is a health check extension for the KumuluzEE microservice framework. Is provides easy, consistent and unified way of performing health checking on microservices and exposing health information to be used by monitoring and container orchestration environments such as Kubernetes. KumuluzEE Health is fully compliant with Kubernetes and has been extensively tested to work in Kubernetes.
+
 KumuluzEE Health is compliant with the [MicroProfile Service Health Checks specification 1.0]( https://github.com/eclipse/microprofile-health).
+
 KumuluzEE Health exposes a `/health` endpoint (customizable), which returns the health check status of the microservice.
 
 ## Usage
