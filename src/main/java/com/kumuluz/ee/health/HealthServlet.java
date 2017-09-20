@@ -23,6 +23,7 @@ package com.kumuluz.ee.health;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.health.checks.DataSourceHealthCheck;
 import com.kumuluz.ee.health.checks.DiskSpaceHealthCheck;
@@ -82,7 +83,8 @@ public class HealthServlet extends HttpServlet {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType(MediaType.APPLICATION_JSON);
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+
         response.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
 
         ServletOutputStream output = null;
@@ -107,9 +109,12 @@ public class HealthServlet extends HttpServlet {
                 }
             }
 
-            // write response
-            getWriter(request).writeValue(output, healthServletResponse);
-
+            // write results to response if servlet.response or debug is enabled
+            if (configurationUtil.getBoolean("kumuluzee.health.servlet.enabled").orElse(true) ||
+                    EeConfig.getInstance().getDebug()) {
+                response.setContentType(MediaType.APPLICATION_JSON);
+                getWriter(request).writeValue(output, healthServletResponse);
+            }
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An error occurred when trying to evaluate health checks.", exception);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
