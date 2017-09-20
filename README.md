@@ -45,7 +45,7 @@ There are two ways how we can implement a custom health check.
 
 ### @Health annotation
 
-To implement health checks using `@Health` annotation, we have to implement a CDI bean class, which implements the `HealthCheck` interface. Such health checks are auto antically discoverd and registered to the `HealthRegistry`.
+To implement health checks using `@Health` annotation, we have to implement a CDI bean class, which implements the `HealthCheck` interface. Such health checks are automatically discovered and registered to the `HealthRegistry`.
 
 Shown below is an example of a CDI bean health check using `@Health` annotation:
 
