@@ -1,21 +1,18 @@
 # KumuluzEE Health
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-health/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-health)
 
-> Health extension in compliance with microprofile-health specification provides you with a consistent, unified way of performing microservice health checks for the lightweight KumuluzEE framework.
+> KumuluzEE Health extension provides consistent, unified way of performing microservice health checks and exposing health information.
 
-KumuluzEE Health is a health check extension for the KumuluzEE microservice framework. Is was specifically designed for checking the health of microservices.
-KumuluzEE Health is compliant with MicroProfile Healthcheck specification 1.0 (preliminary).
-KumuluzEE Health exposes a `/health` endpoint, which returns the health check status of the microservice.
+KumuluzEE Health is a health check extension for the KumuluzEE microservice framework. Is provides easy, consistent and unified way of performing health checking on microservices and exposing health information to be used by monitoring and container orchestration environments such as Kubernetes. KumuluzEE Health is fully compliant with Kubernetes and has been extensively tested to work in Kubernetes.
+
+KumuluzEE Health is compliant with the [MicroProfile Service Health Checks specification 1.0]( https://github.com/eclipse/microprofile-health).
+
+KumuluzEE Health exposes a `/health` endpoint (customizable), which returns the health check status of the microservice.
 
 ## Usage
-You can enable the health module by adding the following dependencies:
+You can enable the KumuluzEE Health module by adding the following dependencies:
 
 ```xml
-<dependency>
-    <groupId>com.kumuluz.ee.health</groupId>
-    <artifactId>kumuluzee-cdi-weld</artifactId>
-    <version>${kumuluzee.version}</version>
-</dependency>
 <dependency>
     <groupId>com.kumuluz.ee.health</groupId>
     <artifactId>kumuluzee-health</artifactId>
@@ -23,20 +20,58 @@ You can enable the health module by adding the following dependencies:
 </dependency>
 ```
 
+CDI dependency is a prerequisite. Please refer to KumuluzEE [readme]( https://github.com/kumuluz/kumuluzee/) for more information. 
+
 ## Health checks
 
-To check health of a microservice, you can either use the provided health checks, or you can define your own health checks.
+To check health of a microservice, you can use the provided health checks or you can define your own health checks.
+
+## Built-in health checks
 
 The following health checks are available out-of-the-box: 
 
 - **DataSourceHealthCheck** for checking the availability of the data source
 - **DiskSpaceHealthCheck** for checking available disk space against a threshold
-- **MongoHealthCheck** for checking the availability of mongo database
-- **RedisHealthCheck** for checking the availability of redis store
+- **MongoHealthCheck** for checking the availability of Mongo database
+- **RedisHealthCheck** for checking the availability of Redis store
 
-### Implementing custom health checks
+Additional built-in health check will be provided (contributions are welcome).
 
-Bellow is an example of a custom health check implementation in which we check if the KumuluzEE github page is accessible: 
+## Implementing custom health checks
+
+There are two ways how we can implement a custom health check.
+* We can use the `@Health` annotation to define health check classes.
+* We can implement health check classes and register them manually.
+
+### @Health annotation
+
+To implement health checks using `@Health` annotation, we have to implement a CDI bean class, which implements the `HealthCheck` interface. Such health checks are auto antically discoverd and registered to the `HealthRegistry`.
+
+Shown below is an example of a CDI bean health check using `@Health` annotation:
+
+```java
+import org.eclipse.microprofile.health.Health;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+
+import javax.enterprise.context.ApplicationScoped;
+
+@Health
+@ApplicationScoped
+public class SuccessfulHealthCheckBean implements HealthCheck {
+
+    public HealthCheckResponse call() {
+        return HealthCheckResponse.named(SuccessfulHealthCheckBean.class.getSimpleName()).up().build();
+    }
+
+}
+```
+
+### Health check implemented as class
+
+To implement a health check with a custom class, the class has to implement the `HealthCheck` interface. Such class has to be manually registered with the `HealthRegistry`.
+
+Shown below is a custom health check implementation. It checks if the KumuluzEE GitHub page is accessible. 
 
 ```java
 import org.eclipse.microprofile.health.HealthCheck;
@@ -71,7 +106,7 @@ public class GithubHealthCheck implements HealthCheck {
 
 ### Registering custom health checks
 
-Registering custom health checks can be done via HealthRegistry instance by providing health check unique name and an instance of the health check class.
+To register a custom health check class we have to use the `HealthRegistry` instance. We provide the health check unique name and an instance of the health check class.
 
 ```java
 HealthRegistry.getInstance().register(GithubHealthCheck.class.getSimpleName(), new GithubHealthCheck());
@@ -79,47 +114,58 @@ HealthRegistry.getInstance().register(GithubHealthCheck.class.getSimpleName(), n
 
 ### Unregistering custom health checks
 
-Unregistering custom health checks can be done via HealthRegistry instance by providing a health check unique name.
+To unregister custom health checks we can use the `HealthRegistry` instance and provide the health check unique name.
 
 ```java
 HealthRegistry.getInstance().unregister(GithubHealthCheck.class.getSimpleName());
 ```
 
-### Retrieving health check results
+## Retrieving health check results
 
-Retrieving health check results can be done via HealthRegistry instance. The results will be returned in a list of health check responses.
+To invoke the health check and retrieve the result we can use the `HealthRegistry` instance. The results will be returned in a list of health check responses.
 
 ```java
 List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
 ```
 
-### Integration with CDI
 
-CDI beans which implement `HealthCheck` and are annotated with `@Health` are discover and registered to the HealthRegistry automatically.
+## /health endpoint output
 
-Bellow is an example of such a bean:
+The `/health` endpoint output returns:
+- 200 with payload, when health checks are defined with positive outcome or are not defined
+- 503 with payload, when health checks are defined, but at least one outcome is negative
+- 500 without payload, when an exception occurred in the procedure of health checking
 
-```java
-import org.eclipse.microprofile.health.Health;
-import org.eclipse.microprofile.health.HealthCheck;
-import org.eclipse.microprofile.health.HealthCheckResponse;
+The health check is available on http://IP:PORT/health by default, payload example is provided below:
 
-import javax.enterprise.context.ApplicationScoped;
-
-@Health
-@ApplicationScoped
-public class SuccessfulHealthCheckBean implements HealthCheck {
-
-    public HealthCheckResponse call() {
-        return HealthCheckResponse.named(SuccessfulHealthCheckBean.class.getSimpleName()).up().build();
-    }
-
+```json
+{
+  "outcome" : "UP",
+  "checks" : [ {
+    "name" : "DataSourceHealthCheck",
+    "state" : "UP"
+  }, {
+    "name" : "DiskSpaceHealthCheck",
+    "state" : "UP"
+  }, {
+    "name" : "MongoHealthCheck",
+    "state" : "UP"
+  }, {
+    "name" : "RedisHealthCheck",
+    "state" : "UP"
+  } ]
 }
 ```
 
-## Configuration of health checks
+The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
 
-The health servlet is registered automatically on path `/health`. However, custom servlet mapping can be specified by providing servlet mapping location in the configuration file.
+```json
+{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
+```
+
+## Configuring health check endpoint
+
+The provide access to health check via URL, the health servlet is registered automatically on path `/health`. However, custom servlet mapping can be specified by providing servlet mapping location in the configuration.
 
 Example of the configuration:
 
@@ -130,11 +176,15 @@ kumuluzee:
       mapping: /health
 ```
 
+## Configuring built-in health checks
+
+To configure built-in health checks, we can use the configuration parameters listed below for each built-in health check.
+
 ### DataSourceHealthCheck
 
-To enable data source availability health check the check needs to be provided in the health checks sections in the configuration file. Jndi-name or connection-url, username and password need to be provided as part of the health check configuration.
+To enable data source availability health check, we need to provide in the health check sections. `Jndi-name`, `connection-url`, `username` and `password` need to be provided as part of the health check configuration.
 
-Example of the configuration:
+Example configuration:
 
 ```yaml
 kumuluzee:
@@ -174,7 +224,7 @@ kumuluzee:
 
 ### DiskSpaceHealthCheck
 
-To enable disk space health check the check needs to be provided in the health checks sections in the configuration file. The default disk space threshold is `100MB`, but can be overwritten by providing threshold.
+To enable disk space health check, we need to provide the health check config parameters, listed below. The default disk space threshold is `100MB`, but can be overwritten by providing your own threshold.
 
 Example of the configuration:
 
@@ -188,7 +238,7 @@ kumuluzee:
 
 ### MongoHealthCheck
 
-To enable mongo database health check the check needs to be provided in the health checks sections in the configuration file. Connection-url with user, password, database name and other options need to be provided as part of the health check configuration as described in the [mongo-java-driver-documentation](https://mongodb.github.io/mongo-java-driver/3.5/javadoc/com/mongodb/MongoClientURI.html). The default connection-url is `mongodb://localhost:27017/local?serverSelectionTimeoutMS=2000`.
+To enable the Mongo database health check, we need to provide the `connection-url` config parameter with user, password, database name and other options need to be provided as part of the health check configuration as described in the [mongo-java-driver-documentation](https://mongodb.github.io/mongo-java-driver/3.5/javadoc/com/mongodb/MongoClientURI.html). The default connection-url is `mongodb://localhost:27017/local?serverSelectionTimeoutMS=2000`.
 
 Example of the configuration:
 
@@ -202,7 +252,7 @@ kumuluzee:
 
 ### RedisHealthCheck
 
-To enable redis store health check the check needs to be provided in the health checks sections in the configuration file. Connection-url with port, secret and database number need to be provided as part of the health check configuration. The default connection-url is `redis://localhost:6379/0`.
+To enable Redis store health check, we need to specify the `connection-url` with port, secret and database number as a part of the health check configuration. The default connection-url is `redis://localhost:6379/0`.
 
 Example of the configuration:
 
@@ -214,58 +264,6 @@ kumuluzee:
         connection-url: redis://:secret@localhost:6379/0
 ```
 
-## /health endpoint output
-
-The `/health` endpoint output returns:
-- 200 with payload, when health checks are defined with positive outcome or are not defined
-- 503 with payload, when health checks are defined, but at least one outcome is negative
-- 500 without payload, when an exception occurred in the procedure of health checking
-
-The health check is available on http://IP:PORT/health by default, payload example is provided below:
-
-```json
-{
-  "outcome" : "UP",
-  "checks" : [ {
-    "name" : "DataSourceHealthCheck",
-    "state" : "UP"
-  }, {
-    "name" : "DiskSpaceHealthCheck",
-    "state" : "UP"
-  }, {
-    "name" : "MongoHealthCheck",
-    "state" : "UP"
-  }, {
-    "name" : "RedisHealthCheck",
-    "state" : "UP"
-  } ]
-}
-```
-
-The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
-
-```json
-{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
-```
-
-**Build the microservice**
-
-Ensure you have JDK 8 (or newer), Maven 3.2.1 (or newer) and Git installed.
-    
-Build the health library with command:
-
-```bash
-mvn install
-```
-    
-Build archives are located in the modules respected folder `target` and local repository `.m2`.
-
-**Run the microservice**
-
-Use the following command to run the sample from Windows CMD:
-```
-java -cp target/classes;target/dependency/* com.kumuluz.ee.EeApplication 
-```
 
 ## Changelog
 
