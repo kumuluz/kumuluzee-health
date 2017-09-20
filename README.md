@@ -100,33 +100,20 @@ CDI beans which implement `HealthCheck` and are annotated with `@Health` are dis
 Bellow is an example of such a bean:
 
 ```java
+import org.eclipse.microprofile.health.Health;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.logging.Logger;
+import javax.enterprise.context.ApplicationScoped;
 
-public class GithubHealthCheck implements HealthCheck {
+@Health
+@ApplicationScoped
+public class SuccessfulHealthCheckBean implements HealthCheck {
 
-    private static final String url = "https://github.com/kumuluz/kumuluzee";
-
-    private static final Logger LOG = Logger.getLogger(GithubHealthCheck.class.getSimpleName());
-
-    @Override
     public HealthCheckResponse call() {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestMethod("HEAD");
-
-            if (connection.getResponseCode() == 200) {
-                return HealthCheckResponse.named(GithubHealthCheck.class.getSimpleName()).up().build();
-            }
-        } catch (Exception exception) {
-            LOG.severe(exception.getMessage());
-        }
-        return HealthCheckResponse.named(GithubHealthCheck.class.getSimpleName()).down().build();
+        return HealthCheckResponse.named(SuccessfulHealthCheckBean.class.getSimpleName()).up().build();
     }
+
 }
 ```
 
