@@ -41,8 +41,6 @@ public class HealthInitiator {
     private static final Logger LOG = Logger.getLogger(HealthInitiator.class.getName());
 
     private void initialiseBean(@Observes @Initialized(ApplicationScoped.class) Object init) {
-        LOG.info("Initializing KumuluzEE Health extension");
-
         // servlet mapping
         String servletMapping = ConfigurationUtil.getInstance().get("kumuluzee.health.servlet.mapping")
                 .orElse("/health");

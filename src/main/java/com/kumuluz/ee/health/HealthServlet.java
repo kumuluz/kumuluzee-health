@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -110,8 +111,7 @@ public class HealthServlet extends HttpServlet {
             getWriter(request).writeValue(output, healthServletResponse);
 
         } catch (Exception exception) {
-            String message = "An error occurred when trying to evaluate health checks.";
-            LOG.severe(message + " " + exception.getMessage());
+            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate health checks.", exception);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             if (output != null) {

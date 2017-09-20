@@ -28,6 +28,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -46,14 +47,15 @@ public class DataSourceHealthCheck implements HealthCheck {
             connection = getConnection();
             return HealthCheckResponse.named(DataSourceHealthCheck.class.getSimpleName()).up().build();
         } catch (Exception exception) {
-            LOG.severe("Connection to data source couldn't be established. " + exception.getMessage());
+            LOG.log(Level.SEVERE, "Connection to data source couldn't be established.", exception);
             return HealthCheckResponse.named(DataSourceHealthCheck.class.getSimpleName()).down().build();
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
-                    LOG.severe(exception.getMessage());
+                    LOG.log(Level.SEVERE, "An error occured when trying to close connection to data source.",
+                            exception);
                 }
             }
         }

@@ -27,6 +27,7 @@ import com.mongodb.client.MongoCursor;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -60,7 +61,7 @@ public class MongoHealthCheck implements HealthCheck {
                 return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).down().build();
             }
         } catch (Exception exception) {
-            LOG.severe("Connection to Mongo couldn't be established. " + exception.getMessage());
+            LOG.log(Level.SEVERE, "Connection to Mongo couldn't be established.", exception);
             return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).down().build();
         } finally {
             if (mongoClient != null) {

@@ -25,6 +25,7 @@ import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import redis.clients.jedis.JedisPool;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -50,7 +51,7 @@ public class RedisHealthCheck implements HealthCheck {
             pool.getResource();
             return HealthCheckResponse.named(RedisHealthCheck.class.getSimpleName()).up().build();
         } catch (Exception exception) {
-            LOG.severe("Connection to Redis couldn't be established. " + exception.getMessage());
+            LOG.log(Level.SEVERE, "Connection to Redis couldn't be established.", exception);
             return HealthCheckResponse.named(RedisHealthCheck.class.getSimpleName()).down().build();
         } finally {
             if (pool != null) {
