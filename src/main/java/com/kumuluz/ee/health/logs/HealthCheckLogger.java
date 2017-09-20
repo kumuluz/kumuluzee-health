@@ -44,17 +44,21 @@ public class HealthCheckLogger implements Runnable {
 
     @Override
     public void run() {
-        List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
+        try {
+            List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
 
-        LOG.log(this.LEVEL, "Overall health check outcome is {0}.",
-                results.stream().anyMatch(result -> result.getState().equals(HealthCheckResponse.State.DOWN)) ?
-                        HealthCheckResponse.State.DOWN : HealthCheckResponse.State.UP);
+            LOG.log(this.LEVEL, "Overall health check outcome is {0}.",
+                    results.stream().anyMatch(result -> result.getState().equals(HealthCheckResponse.State.DOWN)) ?
+                            HealthCheckResponse.State.DOWN : HealthCheckResponse.State.UP);
 
-        for (HealthCheckResponse healthCheckResponse : results) {
-            String[] objects = new String[2];
-            objects[0] = healthCheckResponse.getName();
-            objects[1] = healthCheckResponse.getState().toString();
-            LOG.log(this.LEVEL, "Health check {0} outcome is {1}.", objects);
+            for (HealthCheckResponse healthCheckResponse : results) {
+                String[] objects = new String[2];
+                objects[0] = healthCheckResponse.getName();
+                objects[1] = healthCheckResponse.getState().toString();
+                LOG.log(this.LEVEL, "Health check {0} outcome is {1}.", objects);
+            }
+        } catch(Exception exception){
+            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate health checks.", exception);
         }
     }
 }
