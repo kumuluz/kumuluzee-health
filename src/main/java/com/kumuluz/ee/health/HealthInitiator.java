@@ -26,10 +26,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
-import javax.servlet.annotation.WebListener;
 import java.util.logging.Logger;
 
 /**
@@ -39,27 +36,11 @@ import java.util.logging.Logger;
  * @since 1.0.0
  */
 @ApplicationScoped
-@WebListener
-public class HealthInitiator implements ServletContextListener {
+public class HealthInitiator {
 
     private static final Logger LOG = Logger.getLogger(HealthInitiator.class.getName());
 
-    private boolean beanInitialised;
-
-    @Override
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
-        if (!beanInitialised) {
-            beanInitialised = initialiseBean(servletContextEvent.getServletContext());
-        }
-    }
-
-    public void cdiInitialised(@Observes @Initialized(ApplicationScoped.class) Object init) {
-        if (!beanInitialised && init instanceof ServletContext) {
-            beanInitialised = initialiseBean((ServletContext) init);
-        }
-    }
-
-    private boolean initialiseBean(ServletContext servletContext) {
+    private void initialiseBean(@Observes @Initialized(ApplicationScoped.class) Object init) {
         LOG.info("Initializing KumuluzEE Health extension");
 
         // servlet mapping
@@ -69,16 +50,9 @@ public class HealthInitiator implements ServletContextListener {
         LOG.info("Registering health servlet on " + servletMapping);
 
         // register servlet
-        ServletRegistration.Dynamic dynamicRegistration = servletContext.addServlet("health", new
+        ServletRegistration.Dynamic dynamicRegistration = ((ServletContext) init).addServlet("health", new
                 HealthServlet());
 
         dynamicRegistration.addMapping(servletMapping);
-
-        LOG.info("KumuluzEE Health extension initialized");
-        return true;
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
     }
 }

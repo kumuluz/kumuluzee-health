@@ -77,8 +77,7 @@ public class HealthServlet extends HttpServlet {
             healthCheckRegistry.register("RedisHealthCheck", new RedisHealthCheck());
         }
 
-        this.mapper = new ObjectMapper();
-        this.mapper.registerModule(new Jdk8Module());
+        this.mapper = new ObjectMapper().registerModule(new Jdk8Module());
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -86,29 +85,29 @@ public class HealthServlet extends HttpServlet {
         response.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
 
         ServletOutputStream output = null;
-
         try {
             output = response.getOutputStream();
+            response.setStatus(HttpServletResponse.SC_OK);
 
             // get results
             List<HealthCheckResponse> results = healthCheckRegistry.getResults();
 
-            int status = HttpServletResponse.SC_OK;
+            // prepare response
+            HealthServletResponse healthServletResponse = new HealthServletResponse();
+            healthServletResponse.setChecks(results);
+            healthServletResponse.setOutcome(HealthCheckResponse.State.UP);
 
-            HealthServletResponse result = new HealthServletResponse();
-            result.setChecks(results);
-            result.setOutcome(HealthCheckResponse.State.UP);
-
-            for (HealthCheckResponse r : results) {
-                if (HealthCheckResponse.State.DOWN.equals(r.getState())) {
-                    status = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
-                    result.setOutcome(HealthCheckResponse.State.DOWN);
+            // check if any check is down
+            for (HealthCheckResponse result : results) {
+                if (HealthCheckResponse.State.DOWN.equals(result.getState())) {
+                    response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                    healthServletResponse.setOutcome(HealthCheckResponse.State.DOWN);
                     break;
                 }
             }
 
-            response.setStatus(status);
-            getWriter(request).writeValue(output, result);
+            // write response
+            getWriter(request).writeValue(output, healthServletResponse);
 
         } catch (Exception exception) {
             String message = "An error occurred when trying to evaluate health checks.";
@@ -119,10 +118,6 @@ public class HealthServlet extends HttpServlet {
                 output.close();
             }
         }
-    }
-
-    public void destroy() {
-        // do nothing.
     }
 
     private ObjectWriter getWriter(HttpServletRequest request) {

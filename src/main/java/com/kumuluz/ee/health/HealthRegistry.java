@@ -45,7 +45,7 @@ public class HealthRegistry {
     }
 
     /**
-     * Returns org.eclipse.microprofile.health.spi.HealthCheckResponseProvider singleton HealthRegistry instance
+     * Returns singleton HealthRegistry instance
      *
      * @return HealthRegistry instance
      */
@@ -80,7 +80,7 @@ public class HealthRegistry {
     /**
      * Executes health checks and returns results.
      *
-     * @return map of health check results
+     * @return list of health check results
      */
     public List<HealthCheckResponse> getResults() {
         List<HealthCheckResponse> results = new ArrayList<>();
