@@ -67,7 +67,7 @@ public class SuccessfulHealthCheckBean implements HealthCheck {
 }
 ```
 
-### Health check implemented as classes
+### Health check implemented as class
 
 To implement a health check with a custom class, the class has to implement the `HealthCheck` interface. Such class has to be manually registered with the `HealthRegistry`.
 
