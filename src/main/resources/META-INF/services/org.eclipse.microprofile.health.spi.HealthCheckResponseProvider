@@ -1,1 +1,1 @@
-com.kumuluz.ee.health.KumuluzHealthCheckResponseProvider
+com.kumuluz.ee.health.providers.KumuluzHealthCheckResponseProvider
