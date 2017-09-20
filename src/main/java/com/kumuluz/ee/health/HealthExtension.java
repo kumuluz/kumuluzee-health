@@ -28,8 +28,6 @@ import com.kumuluz.ee.common.dependencies.EeExtensionDef;
 import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 
-import java.util.logging.Logger;
-
 /**
  * KumuluzEE Health extension.
  *
@@ -40,14 +38,11 @@ import java.util.logging.Logger;
 @EeComponentDependency(EeComponentType.CDI)
 public class HealthExtension implements Extension {
 
-    private static final Logger LOG = Logger.getLogger(HealthExtension.class.getName());
-
     @Override
     public void load() {
     }
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
-        LOG.info("Initializing Health extension");
     }
 }

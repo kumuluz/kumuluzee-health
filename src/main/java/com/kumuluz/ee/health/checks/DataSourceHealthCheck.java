@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  */
 public class DataSourceHealthCheck implements HealthCheck {
 
-    private Logger LOG = Logger.getLogger(DataSourceHealthCheck.class.getName());
+    private static final Logger LOG = Logger.getLogger(DataSourceHealthCheck.class.getName());
 
     @Override
     public HealthCheckResponse call() {

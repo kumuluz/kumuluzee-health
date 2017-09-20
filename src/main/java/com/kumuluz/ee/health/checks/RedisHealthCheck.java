@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  */
 public class RedisHealthCheck implements HealthCheck {
 
-    private Logger LOG = Logger.getLogger(RedisHealthCheck.class.getName());
+    private static final Logger LOG = Logger.getLogger(RedisHealthCheck.class.getName());
 
     // Default redis connection url
     private static final String DEFAULT_REDIS_URL = "redis://localhost:6379/0";

@@ -21,12 +21,17 @@
 package com.kumuluz.ee.health;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.logs.HealthCheckLogger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -40,9 +45,15 @@ public class HealthInitiator {
 
     private static final Logger LOG = Logger.getLogger(HealthInitiator.class.getName());
 
-    private void initialiseBean(@Observes @Initialized(ApplicationScoped.class) Object init) {
-        // servlet mapping
-        String servletMapping = ConfigurationUtil.getInstance().get("kumuluzee.health.servlet.mapping")
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    private void initialize(@Observes @Initialized(ApplicationScoped.class) Object init) {
+        LOG.info("Initializing Health extension");
+
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+
+        // initialize servlet mapping
+        String servletMapping = configurationUtil.get("kumuluzee.health.servlet.mapping")
                 .orElse("/health");
 
         LOG.info("Registering health servlet on " + servletMapping);
@@ -52,5 +63,16 @@ public class HealthInitiator {
                 HealthServlet());
 
         dynamicRegistration.addMapping(servletMapping);
+
+        // initialize health logger
+        if (configurationUtil.getBoolean("kumuluzee.metrics.logs.enabled").orElse(true)) {
+            int period = configurationUtil.getInteger("kumuluzee.health.logs.period-s").orElse(60);
+            String level = configurationUtil.get("kumuluzee.health.logs.level").orElse("DEBUG");
+
+            LOG.log(Level.INFO, "Starting health logger to log health check results every {0} s", period);
+
+            HealthCheckLogger logger = new HealthCheckLogger(level);
+            scheduler.scheduleWithFixedDelay(logger, period, period, TimeUnit.SECONDS);
+        }
     }
 }

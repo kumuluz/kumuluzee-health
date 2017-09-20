@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  */
 public class DiskSpaceHealthCheck implements HealthCheck {
 
-    private Logger LOG = Logger.getLogger(DiskSpaceHealthCheck.class.getName());
+    private static final Logger LOG = Logger.getLogger(DiskSpaceHealthCheck.class.getName());
 
     // Default disk space threshold of 100 MB
     private static final long DEFAULT_THRESHOLD = 100000000;

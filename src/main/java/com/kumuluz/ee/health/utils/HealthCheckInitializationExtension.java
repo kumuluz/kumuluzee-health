@@ -20,7 +20,12 @@
 */
 package com.kumuluz.ee.health.utils;
 
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.health.HealthRegistry;
+import com.kumuluz.ee.health.checks.DataSourceHealthCheck;
+import com.kumuluz.ee.health.checks.DiskSpaceHealthCheck;
+import com.kumuluz.ee.health.checks.MongoHealthCheck;
+import com.kumuluz.ee.health.checks.RedisHealthCheck;
 import org.eclipse.microprofile.health.Health;
 import org.eclipse.microprofile.health.HealthCheck;
 
@@ -34,16 +39,37 @@ import javax.enterprise.util.AnnotationLiteral;
 import java.util.Set;
 
 /**
- * Health check bean registration class.
+ * Health check registration class.
  *
  * @author Marko Škrjanec
  * @since 1.0.0
  */
 public class HealthCheckInitializationExtension implements Extension {
 
-    public <T> void processAnnotatedType(@Observes @Initialized(ApplicationScoped.class) Object init, BeanManager
+    public <T> void registerHealthChecks(@Observes @Initialized(ApplicationScoped.class) Object init, BeanManager
             beanManager) {
 
+        // register classes that implement health checks
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+        HealthRegistry healthCheckRegistry = HealthRegistry.getInstance();
+
+        if (configurationUtil.get("kumuluzee.health.checks.data-source-health-check").isPresent()) {
+            healthCheckRegistry.register("DataSourceHealthCheck", new DataSourceHealthCheck());
+        }
+
+        if (configurationUtil.get("kumuluzee.health.checks.disk-space-health-check").isPresent()) {
+            healthCheckRegistry.register("DiskSpaceHealthCheck", new DiskSpaceHealthCheck());
+        }
+
+        if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
+            healthCheckRegistry.register("MongoHealthCheck", new MongoHealthCheck());
+        }
+
+        if (configurationUtil.get("kumuluzee.health.checks.redis-health-check").isPresent()) {
+            healthCheckRegistry.register("RedisHealthCheck", new RedisHealthCheck());
+        }
+
+        // register beans that implement health checks
         Set<Bean<?>> beans = beanManager.getBeans(HealthCheck.class, new AnnotationLiteral<Health>() {
         });
 

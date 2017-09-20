@@ -23,12 +23,7 @@ package com.kumuluz.ee.health;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.health.checks.DataSourceHealthCheck;
-import com.kumuluz.ee.health.checks.DiskSpaceHealthCheck;
-import com.kumuluz.ee.health.checks.MongoHealthCheck;
-import com.kumuluz.ee.health.checks.RedisHealthCheck;
 import com.kumuluz.ee.health.models.HealthServletResponse;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
@@ -51,40 +46,20 @@ import java.util.logging.Logger;
  */
 public class HealthServlet extends HttpServlet {
 
-    private Logger LOG = Logger.getLogger(HealthServlet.class.getName());
+    private static final Logger LOG = Logger.getLogger(HealthServlet.class.getName());
 
+    private ConfigurationUtil configurationUtil;
     private HealthRegistry healthCheckRegistry;
 
     private ObjectMapper mapper;
 
     public void init() throws ServletException {
-        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-
-        // initialise health checks
-        healthCheckRegistry = HealthRegistry.getInstance();
-
-        if (configurationUtil.get("kumuluzee.health.checks.data-source-health-check").isPresent()) {
-            healthCheckRegistry.register("DataSourceHealthCheck", new DataSourceHealthCheck());
-        }
-
-        if (configurationUtil.get("kumuluzee.health.checks.disk-space-health-check").isPresent()) {
-            healthCheckRegistry.register("DiskSpaceHealthCheck", new DiskSpaceHealthCheck());
-        }
-
-        if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
-            healthCheckRegistry.register("MongoHealthCheck", new MongoHealthCheck());
-        }
-
-        if (configurationUtil.get("kumuluzee.health.checks.redis-health-check").isPresent()) {
-            healthCheckRegistry.register("RedisHealthCheck", new RedisHealthCheck());
-        }
-
+        this.configurationUtil = ConfigurationUtil.getInstance();
+        this.healthCheckRegistry = HealthRegistry.getInstance();
         this.mapper = new ObjectMapper().registerModule(new Jdk8Module());
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-
         response.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
 
         ServletOutputStream output = null;
@@ -93,7 +68,7 @@ public class HealthServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
 
             // get results
-            List<HealthCheckResponse> results = healthCheckRegistry.getResults();
+            List<HealthCheckResponse> results = this.healthCheckRegistry.getResults();
 
             // prepare response
             HealthServletResponse healthServletResponse = new HealthServletResponse();
@@ -110,8 +85,8 @@ public class HealthServlet extends HttpServlet {
             }
 
             // write results to response if servlet.response or debug is enabled
-            if (configurationUtil.getBoolean("kumuluzee.health.servlet.enabled").orElse(true) ||
-                    EeConfig.getInstance().getDebug()) {
+            if (this.configurationUtil.getBoolean("kumuluzee.health.servlet.enabled").orElse(true) ||
+                    this.configurationUtil.getBoolean("kumuluzee.debug").orElse(false)) {
                 response.setContentType(MediaType.APPLICATION_JSON);
                 getWriter(request).writeValue(output, healthServletResponse);
             }

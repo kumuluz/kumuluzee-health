@@ -36,16 +36,15 @@ import java.util.logging.Logger;
  */
 public class MongoHealthCheck implements HealthCheck {
 
-    private Logger LOG = Logger.getLogger(MongoHealthCheck.class.getName());
+    private static final Logger LOG = Logger.getLogger(MongoHealthCheck.class.getName());
 
     // Default redis connection url
     private static final String DEFAULT_MONGO_URL = "mongodb://localhost:27017/local?serverSelectionTimeoutMS=2000";
 
     @Override
     public HealthCheckResponse call() {
-        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-
-        String connectionUrl = configurationUtil.get("kumuluzee.health.checks.mongo-health-check.connection-url")
+        String connectionUrl = ConfigurationUtil.getInstance()
+                .get("kumuluzee.health.checks.mongo-health-check.connection-url")
                 .orElse(DEFAULT_MONGO_URL);
 
         MongoClient mongoClient = null;
