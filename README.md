@@ -227,17 +227,17 @@ The health check is available on http://IP:PORT/health by default, payload examp
 {
   "outcome" : "UP",
   "checks" : [ {
-    "id" : "DataSourceHealthCheck",
-    "result" : "UP"
+    "name" : "DataSourceHealthCheck",
+    "state" : "UP"
   }, {
-    "id" : "DiskSpaceHealthCheck",
-    "result" : "UP"
+    "name" : "DiskSpaceHealthCheck",
+    "state" : "UP"
   }, {
-    "id" : "MongoHealthCheck",
-    "result" : "UP"
+    "name" : "MongoHealthCheck",
+    "state" : "UP"
   }, {
-    "id" : "RedisHealthCheck",
-    "result" : "UP"
+    "name" : "RedisHealthCheck",
+    "state" : "UP"
   } ]
 }
 ```
@@ -245,7 +245,7 @@ The health check is available on http://IP:PORT/health by default, payload examp
 The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
 
 ```json
-{"outcome":"UP","checks":[{"id":"DataSourceHealthCheck","result":"UP"},{"id":"DiskSpaceHealthCheck","result":"UP"},{"id":"MongoHealthCheck","result":"UP"},{"id":"RedisHealthCheck","result":"UP"}]}
+{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
 ```
 
 **Build the microservice**
