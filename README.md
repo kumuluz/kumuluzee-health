@@ -165,7 +165,11 @@ The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pre
 
 ## Configuring health check endpoint
 
-The provide access to health check via URL, the health servlet is registered automatically on path `/health`. However, custom servlet mapping can be specified by providing servlet mapping location in the configuration.
+Health check is provided via URL, the health servlet is registered automatically on path `/health`. To configure the health check endpoint, you can specify the following configuration keys: 
+- `kumuluzee.health.servlet.mapping`: Health servlet path. Default value is `/health`.
+- `kumuluzee.health.servlet.enabled`: Is JSON output enabled. Default value is `true`. If false only the status codes will be provided.
+
+The JSON output will also be enabled if the DEBUG mode is enabled, by setting `kumuluz.debug`.
 
 Example of the configuration:
 
@@ -174,6 +178,25 @@ kumuluzee:
   health:
     servlet:
       mapping: /health
+      enabled: true
+```
+
+## Enabling health check logging
+
+Periodic logging of health check results is also available. To configure the health check results logging, you can specify the following configuration keys:
+- `kumuluzee.health.logs.enabled`: Is logging enabled. Default value is `true`.
+- `kumuluzee.health.logs.level`: The logging level. Default value is `FINE`.
+- `kumuluzee.health.logs.period-s`: The logging period in seconds. Default value is `60`.
+
+Example of the configuration:
+
+```yaml
+kumuluzee:
+  health:
+    logs:
+      enabled: true
+      level: FINE
+      period-s: 60
 ```
 
 ## Configuring built-in health checks
