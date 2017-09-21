@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.health.models.HealthServletResponse;
+import com.kumuluz.ee.health.models.HealthResponse;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
 import javax.servlet.ServletException;
@@ -71,15 +71,15 @@ public class HealthServlet extends HttpServlet {
             List<HealthCheckResponse> results = this.healthCheckRegistry.getResults();
 
             // prepare response
-            HealthServletResponse healthServletResponse = new HealthServletResponse();
-            healthServletResponse.setChecks(results);
-            healthServletResponse.setOutcome(HealthCheckResponse.State.UP);
+            HealthResponse healthResponse = new HealthResponse();
+            healthResponse.setChecks(results);
+            healthResponse.setOutcome(HealthCheckResponse.State.UP);
 
             // check if any check is down
             for (HealthCheckResponse result : results) {
                 if (HealthCheckResponse.State.DOWN.equals(result.getState())) {
                     response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                    healthServletResponse.setOutcome(HealthCheckResponse.State.DOWN);
+                    healthResponse.setOutcome(HealthCheckResponse.State.DOWN);
                     break;
                 }
             }
@@ -88,10 +88,10 @@ public class HealthServlet extends HttpServlet {
             if (this.configurationUtil.getBoolean("kumuluzee.health.servlet.enabled").orElse(true) ||
                     this.configurationUtil.getBoolean("kumuluzee.debug").orElse(false)) {
                 response.setContentType(MediaType.APPLICATION_JSON);
-                getWriter(request).writeValue(output, healthServletResponse);
+                getWriter(request).writeValue(output, healthResponse);
             }
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate health checks.", exception);
+            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate and log health response.", exception);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             if (output != null) {

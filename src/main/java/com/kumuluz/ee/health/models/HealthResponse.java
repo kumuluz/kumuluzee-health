@@ -31,13 +31,13 @@ import java.util.List;
  * @since 1.0.0
  */
 @JsonInclude(Include.NON_NULL)
-public class HealthServletResponse {
+public class HealthResponse {
 
     private HealthCheckResponse.State outcome;
 
     private List<HealthCheckResponse> checks;
 
-    public HealthServletResponse() {
+    public HealthResponse() {
     }
 
     public HealthCheckResponse.State getOutcome() {

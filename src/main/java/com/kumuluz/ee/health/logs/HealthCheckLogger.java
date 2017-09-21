@@ -23,7 +23,7 @@ package com.kumuluz.ee.health.logs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.kumuluz.ee.health.HealthRegistry;
-import com.kumuluz.ee.health.models.HealthServletResponse;
+import com.kumuluz.ee.health.models.HealthResponse;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
 import java.util.List;
@@ -53,15 +53,15 @@ public class HealthCheckLogger implements Runnable {
         try {
             List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
 
-            HealthServletResponse healthServletResponse = new HealthServletResponse();
-            healthServletResponse.setChecks(results);
-            healthServletResponse.setOutcome(
+            HealthResponse healthResponse = new HealthResponse();
+            healthResponse.setChecks(results);
+            healthResponse.setOutcome(
                     results.stream().anyMatch(result -> result.getState().equals(HealthCheckResponse.State.DOWN)) ?
                             HealthCheckResponse.State.DOWN : HealthCheckResponse.State.UP);
 
-            LOG.log(LEVEL, this.mapper.writer().writeValueAsString(healthServletResponse));
+            LOG.log(LEVEL, this.mapper.writer().writeValueAsString(healthResponse));
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate and log health checks.", exception);
+            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate and log health response.", exception);
         }
     }
 }
