@@ -54,19 +54,19 @@ public class HealthCheckInitializationExtension implements Extension {
         HealthRegistry healthCheckRegistry = HealthRegistry.getInstance();
 
         if (configurationUtil.get("kumuluzee.health.checks.data-source-health-check").isPresent()) {
-            healthCheckRegistry.register("DataSourceHealthCheck", new DataSourceHealthCheck());
+            healthCheckRegistry.register(DataSourceHealthCheck.class.getSimpleName(), new DataSourceHealthCheck());
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.disk-space-health-check").isPresent()) {
-            healthCheckRegistry.register("DiskSpaceHealthCheck", new DiskSpaceHealthCheck());
+            healthCheckRegistry.register(DiskSpaceHealthCheck.class.getSimpleName(), new DiskSpaceHealthCheck());
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
-            healthCheckRegistry.register("MongoHealthCheck", new MongoHealthCheck());
+            healthCheckRegistry.register(MongoHealthCheck.class.getSimpleName(), new MongoHealthCheck());
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.redis-health-check").isPresent()) {
-            healthCheckRegistry.register("RedisHealthCheck", new RedisHealthCheck());
+            healthCheckRegistry.register(RedisHealthCheck.class.getSimpleName(), new RedisHealthCheck());
         }
 
         // register beans that implement health checks
