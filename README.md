@@ -169,7 +169,7 @@ Health check is provided via URL, the health servlet is registered automatically
 - `kumuluzee.health.servlet.mapping`: Health servlet path. Default value is `/health`.
 - `kumuluzee.health.servlet.enabled`: Is JSON output enabled. Default value is `true`. If false only the status codes will be provided.
 
-The JSON output will also be enabled if the DEBUG mode is enabled, by setting `kumuluz.debug`.
+The JSON output will also be enabled if the DEBUG mode is enabled, by setting `kumuluz.debug` to true.
 
 Example of the configuration:
 
