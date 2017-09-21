@@ -20,7 +20,10 @@
 */
 package com.kumuluz.ee.health.logs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.kumuluz.ee.health.HealthRegistry;
+import com.kumuluz.ee.health.models.HealthServletResponse;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
 import java.util.List;
@@ -38,7 +41,10 @@ public class HealthCheckLogger implements Runnable {
     private static final Logger LOG = Logger.getLogger(HealthCheckLogger.class.getName());
     private static Level LEVEL;
 
+    private ObjectMapper mapper;
+
     public HealthCheckLogger(String level) {
+        this.mapper = new ObjectMapper().registerModule(new Jdk8Module());
         this.LEVEL = Level.parse(level.toUpperCase());
     }
 
@@ -47,18 +53,15 @@ public class HealthCheckLogger implements Runnable {
         try {
             List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
 
-            LOG.log(this.LEVEL, "Overall health check outcome is {0}.",
+            HealthServletResponse healthServletResponse = new HealthServletResponse();
+            healthServletResponse.setChecks(results);
+            healthServletResponse.setOutcome(
                     results.stream().anyMatch(result -> result.getState().equals(HealthCheckResponse.State.DOWN)) ?
                             HealthCheckResponse.State.DOWN : HealthCheckResponse.State.UP);
 
-            for (HealthCheckResponse healthCheckResponse : results) {
-                String[] objects = new String[2];
-                objects[0] = healthCheckResponse.getName();
-                objects[1] = healthCheckResponse.getState().toString();
-                LOG.log(this.LEVEL, "Health check {0} outcome is {1}.", objects);
-            }
-        } catch(Exception exception){
-            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate health checks.", exception);
+            LOG.log(LEVEL, this.mapper.writer().writeValueAsString(healthServletResponse));
+        } catch (Exception exception) {
+            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate and log health checks.", exception);
         }
     }
 }

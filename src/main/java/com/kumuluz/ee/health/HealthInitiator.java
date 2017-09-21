@@ -67,7 +67,7 @@ public class HealthInitiator {
         // initialize health logger
         if (configurationUtil.getBoolean("kumuluzee.metrics.logs.enabled").orElse(true)) {
             int period = configurationUtil.getInteger("kumuluzee.health.logs.period-s").orElse(60);
-            String level = configurationUtil.get("kumuluzee.health.logs.level").orElse("DEBUG");
+            String level = configurationUtil.get("kumuluzee.health.logs.level").orElse("FINE");
 
             LOG.log(Level.INFO, "Starting health logger to log health check results every {0} s", period);
 
