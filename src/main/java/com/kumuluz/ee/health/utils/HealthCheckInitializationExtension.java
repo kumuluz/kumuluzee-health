@@ -58,10 +58,15 @@ public class HealthCheckInitializationExtension implements Extension {
             healthCheckRegistry.register(DiskSpaceHealthCheck.class.getSimpleName(), new DiskSpaceHealthCheck());
         }
 
+        if (configurationUtil.get("kumuluzee.health.checks.elastic-search-health-check").isPresent()) {
+            healthCheckRegistry.register(ElasticSearchHealthCheck.class.getSimpleName(), new ElasticSearchHealthCheck
+                    ());
+        }
+
         if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
             healthCheckRegistry.register(MongoHealthCheck.class.getSimpleName(), new MongoHealthCheck());
         }
-        
+
         if (configurationUtil.get("kumuluzee.health.checks.rabbit-health-check").isPresent()) {
             healthCheckRegistry.register(RabbitHealthCheck.class.getSimpleName(), new RabbitHealthCheck());
         }

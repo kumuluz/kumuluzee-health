@@ -32,6 +32,7 @@ The following health checks are available out-of-the-box:
 
 - **DataSourceHealthCheck** for checking the availability of the data source
 - **DiskSpaceHealthCheck** for checking available disk space against a threshold
+- **ElasticSearchHealthCheck** for checking the availability of Elasticsearch cluster
 - **MongoHealthCheck** for checking the availability of Mongo database
 - **RabbitHealthCheck** for checking the availability of RabbitMQ
 - **RedisHealthCheck** for checking the availability of Redis store
@@ -149,6 +150,9 @@ The health check is available on http://IP:PORT/health by default, payload examp
     "name" : "DiskSpaceHealthCheck",
     "state" : "UP"
   }, {
+    "name" : "ElasticSearchHealthCheck",
+    "state" : "UP"
+  }, {
     "name" : "MongoHealthCheck",
     "state" : "UP"
   }, {
@@ -164,7 +168,7 @@ The health check is available on http://IP:PORT/health by default, payload examp
 The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
 
 ```json
-{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RabbitHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
+{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"ElasticSearchHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RabbitHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
 ```
 
 ## Configuring health check endpoint
@@ -261,6 +265,42 @@ kumuluzee:
     checks:
       disk-space-health-check:
         threshold: 100000000
+```
+
+### ElasticSearchHealthCheck
+
+To enable Elasticsearch cluster health check, we need to specify the `connection-url` with cluster health check endpoint as part of the health check configuration. The cluster health check endpoint is typically available on `http://HOST:IP/_cluster/health`. The response should resemble:
+
+```json
+{
+  "cluster_name" : "testcluster",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 5,
+  "active_shards" : 5,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 5,
+  "delayed_unassigned_shards": 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch": 0,
+  "task_max_waiting_in_queue_millis": 0,
+  "active_shards_percent_as_number": 50.0
+}
+```
+
+This health check checks if the status of HTTP response is 200 and if status field is either `green` or `yellow`. The default connection-url is `http://localhost:9200/_cluster/health`.
+
+Example of the configuration:
+
+```yaml
+kumuluzee:
+  health:
+    checks:
+      elastic-search-health-check:
+        connection-url: http://localhost:9200/_cluster/health?pretty
 ```
 
 ### MongoHealthCheck
