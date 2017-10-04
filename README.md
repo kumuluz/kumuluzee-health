@@ -33,6 +33,7 @@ The following health checks are available out-of-the-box:
 - **DataSourceHealthCheck** for checking the availability of the data source
 - **DiskSpaceHealthCheck** for checking available disk space against a threshold
 - **MongoHealthCheck** for checking the availability of Mongo database
+- **RabbitHealthCheck** for checking the availability of RabbitMQ
 - **RedisHealthCheck** for checking the availability of Redis store
 
 Additional built-in health check will be provided (contributions are welcome).
@@ -151,6 +152,9 @@ The health check is available on http://IP:PORT/health by default, payload examp
     "name" : "MongoHealthCheck",
     "state" : "UP"
   }, {
+    "name" : "RabbitHealthCheck",
+    "state" : "UP"
+  }, {
     "name" : "RedisHealthCheck",
     "state" : "UP"
   } ]
@@ -160,7 +164,7 @@ The health check is available on http://IP:PORT/health by default, payload examp
 The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
 
 ```json
-{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
+{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RabbitHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
 ```
 
 ## Configuring health check endpoint
@@ -273,9 +277,23 @@ kumuluzee:
         connection-url: mongodb://user:password@localhost:27017/customers?serverSelectionTimeoutMS=2000
 ```
 
+### RabbitHealthCheck
+
+To enable RabbitMQ health check, we need to specify the `connection-url` with port, username, password and virtual host as part of the health check configuration. The default connection-url is `amqp://guest:guest@localhost:5672?connection_timeout=2000`.
+
+Example of the configuration:
+
+```yaml
+kumuluzee:
+  health:
+    checks:
+      rabbit-health-check:
+        connection-url: amqp://guest:guest@localhost:5672/virtualHost?connection_timeout=2000
+```
+
 ### RedisHealthCheck
 
-To enable Redis store health check, we need to specify the `connection-url` with port, secret and database number as a part of the health check configuration. The default connection-url is `redis://localhost:6379/0`.
+To enable Redis store health check, we need to specify the `connection-url` with port, secret and database number as part of the health check configuration. The default connection-url is `redis://localhost:6379/0`.
 
 Example of the configuration:
 

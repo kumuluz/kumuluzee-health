@@ -22,10 +22,7 @@ package com.kumuluz.ee.health.utils;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.health.HealthRegistry;
-import com.kumuluz.ee.health.checks.DataSourceHealthCheck;
-import com.kumuluz.ee.health.checks.DiskSpaceHealthCheck;
-import com.kumuluz.ee.health.checks.MongoHealthCheck;
-import com.kumuluz.ee.health.checks.RedisHealthCheck;
+import com.kumuluz.ee.health.checks.*;
 import org.eclipse.microprofile.health.Health;
 import org.eclipse.microprofile.health.HealthCheck;
 
@@ -63,6 +60,10 @@ public class HealthCheckInitializationExtension implements Extension {
 
         if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
             healthCheckRegistry.register(MongoHealthCheck.class.getSimpleName(), new MongoHealthCheck());
+        }
+        
+        if (configurationUtil.get("kumuluzee.health.checks.rabbit-health-check").isPresent()) {
+            healthCheckRegistry.register(RabbitHealthCheck.class.getSimpleName(), new RabbitHealthCheck());
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.redis-health-check").isPresent()) {
