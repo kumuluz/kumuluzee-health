@@ -34,7 +34,7 @@ The following health checks are available out-of-the-box:
 - **DiskSpaceHealthCheck** for checking available disk space against a threshold
 - **ElasticSearchHealthCheck** for checking the availability of Elasticsearch cluster
 - **MongoHealthCheck** for checking the availability of Mongo database
-- **RabbitHealthCheck** for checking the availability of RabbitMQ
+- **RabbitHealthCheck** for checking the availability of RabbitMQ virtual host
 - **RedisHealthCheck** for checking the availability of Redis store
 
 Additional built-in health check will be provided (contributions are welcome).
@@ -291,7 +291,7 @@ To enable Elasticsearch cluster health check, we need to specify the `connection
 }
 ```
 
-This health check checks if the status of HTTP response is 200 and if status field is either `green` or `yellow`. The default connection-url is `http://localhost:9200/_cluster/health`.
+ElasticSearchHealthCheck checks if the status of HTTP response is 200 and if status field is either `green` or `yellow`. The default connection-url is `http://localhost:9200/_cluster/health`.
 
 Example of the configuration:
 
