@@ -78,7 +78,7 @@ public class HealthRegistry {
     }
 
     /**
-     * Executes health checks and returns results.
+     * Executes health checks in parallel and returns results.
      *
      * @return list of health check results
      */

@@ -70,6 +70,13 @@ public class MongoHealthCheck implements HealthCheck {
         }
     }
 
+    /**
+     * Helper method for checking if database name exists.
+     *
+     * @param mongoClient
+     * @param databaseName
+     * @return
+     */
     private Boolean databaseExist(MongoClient mongoClient, String databaseName) {
         if (mongoClient != null && databaseName != null) {
             MongoCursor<String> mongoCursor = mongoClient.listDatabaseNames().iterator();

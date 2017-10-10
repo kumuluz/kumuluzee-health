@@ -53,8 +53,7 @@ public class HealthInitiator {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
         // initialize servlet mapping
-        String servletMapping = configurationUtil.get("kumuluzee.health.servlet.mapping")
-                .orElse("/health");
+        String servletMapping = configurationUtil.get("kumuluzee.health.servlet.mapping").orElse("/health");
 
         LOG.info("Registering health servlet on " + servletMapping);
 
