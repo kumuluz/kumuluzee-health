@@ -23,10 +23,10 @@ package com.kumuluz.ee.health;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 /**
  * Health Registry.
@@ -83,11 +83,8 @@ public class HealthRegistry {
      * @return list of health check results
      */
     public List<HealthCheckResponse> getResults() {
-        List<HealthCheckResponse> results = new ArrayList<>();
-        for (HealthCheck healthCheck : this.healthChecks.values()) {
-            results.add(healthCheck.call());
-        }
-        return results;
+        return this.healthChecks.values().parallelStream().map(healthCheck -> healthCheck.call()).collect(Collectors
+                .toList());
     }
 }
 
