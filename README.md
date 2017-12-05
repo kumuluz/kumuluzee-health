@@ -354,7 +354,7 @@ kumuluzee:
 
 ### RestHealthCheck
 
-To enable REST availability health check, we need to provide in the health check sections. We can provide single or multiple urls for REST availability health check. `Connection-url` needs to be provided as part of the health check configuration.
+We can provide single or multiple urls for REST availability health check. To enable REST availability health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration. 
 
 Example configuration:
 
@@ -363,8 +363,7 @@ kumuluzee:
   health:
     checks:
       rest-health-check:
-        - connection-url: https://github.com/kumuluz/kumuluzee-health
-        - connection-url: http://www.reddit.com
+        connection-url: https://github.com/kumuluz/kumuluzee-health
 ```
 
 Another example of the configuration:
@@ -374,7 +373,8 @@ kumuluzee:
   health:
     checks:
       rest-health-check:
-        connection-url: https://github.com/kumuluz/kumuluzee-health
+        - connection-url: https://github.com/kumuluz/kumuluzee-health
+        - connection-url: http://www.reddit.com
 ```
 
 ## Changelog
