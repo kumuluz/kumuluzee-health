@@ -36,6 +36,7 @@ The following health checks are available out-of-the-box:
 - **MongoHealthCheck** for checking the availability of Mongo database
 - **RabbitHealthCheck** for checking the availability of RabbitMQ virtual host
 - **RedisHealthCheck** for checking the availability of Redis store
+- **RestHealthCheck** for checking the availability of REST resource
 
 Additional built-in health check will be provided (contributions are welcome).
 
@@ -161,6 +162,12 @@ The health check is available on http://IP:PORT/health by default, payload examp
   }, {
     "name" : "RedisHealthCheck",
     "state" : "UP"
+  }, {
+    "name" : "RestHealthCheck",
+    "state" : "UP",
+    "data": {
+      "https://github.com/kumuluz/kumuluzee-health": "UP"
+    }
   } ]
 }
 ```
@@ -168,7 +175,7 @@ The health check is available on http://IP:PORT/health by default, payload examp
 The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
 
 ```json
-{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"ElasticSearchHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RabbitHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
+{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"ElasticSearchHealthCheck","state":"UP"},{"name":"MongoHealthCheck","state":"UP"},{"name":"RabbitHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"},{"name":"RestHealthCheck","state":"UP","data":{"https://github.com/kumuluz/kumuluzee-health":"UP"}}]}
 ```
 
 ## Configuring health check endpoint
@@ -345,6 +352,30 @@ kumuluzee:
         connection-url: redis://:secret@localhost:6379/0
 ```
 
+### RestHealthCheck
+
+To enable REST availability health check, we need to provide in the health check sections. We can provide single or multiple urls for REST availability health check. `Connection-url` needs to be provided as part of the health check configuration.
+
+Example configuration:
+
+```yaml
+kumuluzee:
+  health:
+    checks:
+      rest-health-check:
+        - connection-url: https://github.com/kumuluz/kumuluzee-health
+        - connection-url: http://www.reddit.com
+```
+
+Another example of the configuration:
+
+```yaml
+kumuluzee:
+  health:
+    checks:
+      rest-health-check:
+        connection-url: https://github.com/kumuluz/kumuluzee-health
+```
 
 ## Changelog
 
