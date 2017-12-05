@@ -5,9 +5,9 @@ import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
-import javax.ws.rs.HttpMethod;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +18,8 @@ public class RestHealthCheck implements HealthCheck {
 
     @Override
     public HealthCheckResponse call() {
-        HealthCheckResponseBuilder response = HealthCheckResponse.named(RestHealthCheck.class.getSimpleName()).up();
+        HealthCheckResponseBuilder healthCheckResponseBuilder = HealthCheckResponse.named(RestHealthCheck.class
+                .getSimpleName()).up();
         Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize("kumuluzee.health.checks" +
                 ".rest-health-check");
 
@@ -26,15 +27,15 @@ public class RestHealthCheck implements HealthCheck {
             for (int i = 0; i < connectionUrls.get(); i++) {
                 String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks" +
                         ".rest-health-check[" + i + "].connection-url").orElse("");
-                checkHttpStatus(connectionUrl, response);
+                checkHttpStatus(connectionUrl, healthCheckResponseBuilder);
             }
         } else {
             String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.rest-health-check" +
                     ".connection-url").orElse("");
-            checkHttpStatus(connectionUrl, response);
+            checkHttpStatus(connectionUrl, healthCheckResponseBuilder);
         }
 
-        return response.build();
+        return healthCheckResponseBuilder.build();
     }
 
     /**
@@ -43,28 +44,27 @@ public class RestHealthCheck implements HealthCheck {
      * @param connectionUrl
      * @return
      */
-    private void checkHttpStatus(String connectionUrl, HealthCheckResponseBuilder response) {
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) new URL(connectionUrl).openConnection();
-            connection.setRequestMethod(HttpMethod.HEAD);
+    private void checkHttpStatus(String connectionUrl, HealthCheckResponseBuilder healthCheckResponseBuilder) {
+        WebTarget webTarget = ClientBuilder.newClient().target(connectionUrl);
+        Response response = null;
 
-            if (connection.getResponseCode() >= 200 && connection.getResponseCode() < 300) {
-                response.withData(connectionUrl, HealthCheckResponse.State.UP.toString());
-            } else {
-                response.withData(connectionUrl, HealthCheckResponse.State.DOWN.toString());
-                response.down();
+        try {
+            response = webTarget.request().head();
+
+            if (response.getStatus() >= 200 && response.getStatus() < 300) {
+                healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.State.UP.toString());
+                return;
             }
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "An exception occurred when trying to connect over HTTP to " + connectionUrl + ".",
-                    exception);
-            response.withData(connectionUrl, HealthCheckResponse.State.DOWN.toString());
-            response.down();
+            LOG.log(Level.SEVERE, "An exception occurred when trying to connect over HTTP to.", exception);
+
         } finally {
-            if (connection != null) {
-                connection.disconnect();
+            if (response != null) {
+                response.close();
             }
         }
+        healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.State.DOWN.toString());
+        healthCheckResponseBuilder.down();
     }
 
 }
