@@ -276,7 +276,7 @@ kumuluzee:
 
 ### HttpHealthCheck
 
-We can provide single or multiple urls for HTTP availability health check. To enable HTTP availability health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration. 
+We can provide single or multiple urls for HTTP availability health check. To enable HTTP availability health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration. During the http health check HEAD requests are made to all the `connection-url` and status code is verified if its >=200 and <300.
 
 Example configuration:
 
