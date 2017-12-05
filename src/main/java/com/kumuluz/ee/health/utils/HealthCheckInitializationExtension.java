@@ -75,8 +75,8 @@ public class HealthCheckInitializationExtension implements Extension {
             healthCheckRegistry.register(RedisHealthCheck.class.getSimpleName(), new RedisHealthCheck());
         }
 
-        if (configurationUtil.get("kumuluzee.health.checks.rest-health-check").isPresent()) {
-            healthCheckRegistry.register(RestHealthCheck.class.getSimpleName(), new RestHealthCheck());
+        if (configurationUtil.get("kumuluzee.health.checks.http-health-check").isPresent()) {
+            healthCheckRegistry.register(HttpHealthCheck.class.getSimpleName(), new HttpHealthCheck());
         }
 
         // register beans that implement health checks

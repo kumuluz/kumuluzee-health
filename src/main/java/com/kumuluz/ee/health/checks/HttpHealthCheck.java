@@ -36,25 +36,25 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class RestHealthCheck implements HealthCheck {
+public class HttpHealthCheck implements HealthCheck {
 
-    private static final Logger LOG = Logger.getLogger(RestHealthCheck.class.getName());
+    private static final Logger LOG = Logger.getLogger(HttpHealthCheck.class.getName());
 
     @Override
     public HealthCheckResponse call() {
-        HealthCheckResponseBuilder healthCheckResponseBuilder = HealthCheckResponse.named(RestHealthCheck.class
+        HealthCheckResponseBuilder healthCheckResponseBuilder = HealthCheckResponse.named(HttpHealthCheck.class
                 .getSimpleName()).up();
         Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize("kumuluzee.health.checks" +
-                ".rest-health-check");
+                ".http-health-check");
 
         if (connectionUrls.isPresent()) {
             for (int i = 0; i < connectionUrls.get(); i++) {
                 String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks" +
-                        ".rest-health-check[" + i + "].connection-url").orElse("");
+                        ".http-health-check[" + i + "].connection-url").orElse("");
                 checkHttpStatus(connectionUrl, healthCheckResponseBuilder);
             }
         } else {
-            String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.rest-health-check" +
+            String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.http-health-check" +
                     ".connection-url").orElse("");
             checkHttpStatus(connectionUrl, healthCheckResponseBuilder);
         }
