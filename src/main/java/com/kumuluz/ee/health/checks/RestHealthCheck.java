@@ -56,7 +56,7 @@ public class RestHealthCheck implements HealthCheck {
                 return;
             }
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "An exception occurred when trying to connect over HTTP to.", exception);
+            LOG.log(Level.SEVERE, "An exception occurred when trying to connect over HTTP.", exception);
         } finally {
             if (response != null) {
                 response.close();
