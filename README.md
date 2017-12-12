@@ -33,6 +33,7 @@ The following health checks are available out-of-the-box:
 - **DataSourceHealthCheck** for checking the availability of the data source
 - **DiskSpaceHealthCheck** for checking available disk space against a threshold
 - **ElasticSearchHealthCheck** for checking the availability of Elasticsearch cluster
+- **EtcdHealthCheck** for checking the availability of etcd instance
 - **HttpHealthCheck** for checking the availability of HTTP resource
 - **MongoHealthCheck** for checking the availability of Mongo database
 - **RabbitHealthCheck** for checking the availability of RabbitMQ virtual host
@@ -130,7 +131,6 @@ To invoke the health check and retrieve the result we can use the `HealthRegistr
 ```java
 List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
 ```
-
 
 ## /health endpoint output
 
@@ -274,31 +274,6 @@ kumuluzee:
         threshold: 100000000
 ```
 
-### HttpHealthCheck
-
-We can provide single or multiple urls for HTTP availability health check. To enable HTTP availability health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration. During the http health check HEAD requests are made to all the `connection-url` and status code is verified if its >=200 and <300.
-
-Example configuration:
-
-```yaml
-kumuluzee:
-  health:
-    checks:
-      http-health-check:
-        connection-url: https://github.com/kumuluz/kumuluzee-health
-```
-
-Another example of the configuration:
-
-```yaml
-kumuluzee:
-  health:
-    checks:
-      http-health-check:
-        - connection-url: https://github.com/kumuluz/kumuluzee-health
-        - connection-url: http://www.reddit.com
-```
-
 ### ElasticSearchHealthCheck
 
 To enable Elasticsearch cluster health check, we need to specify the `connection-url` with cluster health check endpoint as part of the health check configuration. The cluster health check endpoint is typically available on `http://HOST:IP/_cluster/health`. The response should resemble:
@@ -333,6 +308,56 @@ kumuluzee:
     checks:
       elastic-search-health-check:
         connection-url: http://localhost:9200/_cluster/health?pretty
+```
+
+### EtcdHealthCheck
+
+To enable etcd health check, we need to specify the `connection-url` as part of the health check configuration. The default connection-url is `http://localhost:2379/health`.
+
+Example configuration:
+
+```yaml
+kumuluzee:
+  health:
+    checks:
+      etcd-health-check:
+        connection-url: http://localhost:2379/health
+```
+
+Another example of the configuration:
+
+```yaml
+kumuluzee:
+  health:
+    checks:
+      etcd-health-check:
+        - connection-url: http://localhost:2379/health
+        - connection-url: http://192.168.99.100:2379/health
+```
+
+### HttpHealthCheck
+
+We can provide single or multiple urls for HTTP availability health check. To enable HTTP availability health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration. During the http health check HEAD requests are made to all the `connection-url` and status code is verified if its >=200 and <300.
+
+Example configuration:
+
+```yaml
+kumuluzee:
+  health:
+    checks:
+      http-health-check:
+        connection-url: https://github.com/kumuluz/kumuluzee-health
+```
+
+Another example of the configuration:
+
+```yaml
+kumuluzee:
+  health:
+    checks:
+      http-health-check:
+        - connection-url: https://github.com/kumuluz/kumuluzee-health
+        - connection-url: http://www.reddit.com
 ```
 
 ### MongoHealthCheck
