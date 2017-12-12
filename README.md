@@ -154,6 +154,12 @@ The health check is available on http://IP:PORT/health by default, payload examp
     "name" : "ElasticSearchHealthCheck",
     "state" : "UP"
   }, {
+    "name" : "EtcdHealthCheck",
+    "state" : "UP",
+    "data": {
+      "http://localhost:2379": "UP" 
+    }
+  }, {
     "name" : "HttpHealthCheck",
     "state" : "UP",
     "data": {
@@ -175,7 +181,7 @@ The health check is available on http://IP:PORT/health by default, payload examp
 The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
 
 ```json
-{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"ElasticSearchHealthCheck","state":"UP"},{"name":"HttpHealthCheck","state":"UP","data":{"https://github.com/kumuluz/kumuluzee-health":"UP"}},{"name":"MongoHealthCheck","state":"UP"},{"name":"RabbitHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
+{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"ElasticSearchHealthCheck","state":"UP"},{"name":"EtcdHealthCheck","state":"UP","data":{"http://localhost:2379": "UP"}},{"name":"HttpHealthCheck","state":"UP","data":{"https://github.com/kumuluz/kumuluzee-health":"UP"}},{"name":"MongoHealthCheck","state":"UP"},{"name":"RabbitHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
 ```
 
 ## Configuring health check endpoint
