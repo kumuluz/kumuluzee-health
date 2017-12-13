@@ -318,7 +318,7 @@ kumuluzee:
 
 ### EtcdHealthCheck
 
-To enable etcd health check, we need to specify the `connection-url` as part of the health check configuration. The default connection-url is `http://localhost:2379/health`.
+To enable etcd health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration. The default connection-url is `http://localhost:2379/health`.
 
 Example configuration:
 
