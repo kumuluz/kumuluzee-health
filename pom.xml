@@ -6,7 +6,7 @@
 
     <groupId>com.kumuluz.ee.health</groupId>
     <artifactId>kumuluzee-health</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>KumuluzEE Health</name>
 
