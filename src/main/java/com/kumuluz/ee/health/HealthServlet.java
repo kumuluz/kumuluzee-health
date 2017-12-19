@@ -91,6 +91,9 @@ public class HealthServlet extends HttpServlet {
                 getWriter(request).writeValue(output, healthResponse);
             }
         } catch (Exception exception) {
+            LOG.log(Level.SEVERE, "An exception occurred when trying to evaluate and log health response.", exception);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (Error exception) {
             LOG.log(Level.SEVERE, "An error occurred when trying to evaluate and log health response.", exception);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {

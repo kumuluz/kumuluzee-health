@@ -61,7 +61,7 @@ public class HealthCheckLogger implements Runnable {
 
             LOG.log(LEVEL, this.mapper.writer().writeValueAsString(healthResponse));
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "An error occurred when trying to evaluate and log health response.", exception);
+            LOG.log(Level.SEVERE, "An exception occurred when trying to evaluate and log health response.", exception);
         }
     }
 }
