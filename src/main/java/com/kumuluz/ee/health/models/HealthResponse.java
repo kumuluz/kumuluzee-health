@@ -27,6 +27,8 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
 import java.util.List;
 
 /**
+ * Health response class.
+ *
  * @author Marko Škrjanec
  * @since 1.0.0
  */

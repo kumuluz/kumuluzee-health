@@ -30,6 +30,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Rabbit MQ health check.
+ *
  * @author Marko Škrjanec
  * @since 1.0.0
  */

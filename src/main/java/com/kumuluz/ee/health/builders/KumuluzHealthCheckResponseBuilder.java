@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ * KumuluzEE HealthCheckResponse builder.
+ *
  * @author Marko Škrjanec
  * @since 1.0.0
  */

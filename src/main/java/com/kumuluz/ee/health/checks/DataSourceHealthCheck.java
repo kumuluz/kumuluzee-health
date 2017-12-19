@@ -32,6 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Data source health check.
+ *
  * @author Marko Škrjanec
  * @since 1.0.0
  */

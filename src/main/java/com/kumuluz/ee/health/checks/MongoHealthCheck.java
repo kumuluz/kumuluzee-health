@@ -31,6 +31,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Mongo DB health check.
+ *
  * @author Marko Škrjanec
  * @since 1.0.0
  */

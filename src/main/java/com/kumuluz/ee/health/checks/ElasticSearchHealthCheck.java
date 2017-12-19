@@ -35,6 +35,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Elasticsearch health check.
+ *
  * @author Marko Škrjanec
  * @since 1.0.0
  */

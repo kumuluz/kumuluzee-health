@@ -25,6 +25,8 @@ import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 import org.eclipse.microprofile.health.spi.HealthCheckResponseProvider;
 
 /**
+ * KumuluzEE health check response provider.
+ *
  * @author Marko Škrjanec
  * @since 1.0.0
  */
