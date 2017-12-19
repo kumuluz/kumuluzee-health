@@ -23,7 +23,6 @@ package com.kumuluz.ee.health.checks;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoCursor;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 

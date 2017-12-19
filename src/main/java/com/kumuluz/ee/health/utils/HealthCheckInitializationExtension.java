@@ -33,7 +33,9 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.util.AnnotationLiteral;
+import java.sql.DriverManager;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Health check registration class.
@@ -43,6 +45,8 @@ import java.util.Set;
  */
 public class HealthCheckInitializationExtension implements Extension {
 
+    private static final Logger LOG = Logger.getLogger(HealthCheckInitializationExtension.class.getName());
+
     public <T> void registerHealthChecks(@Observes @Initialized(ApplicationScoped.class) Object init, BeanManager
             beanManager) {
 
@@ -51,6 +55,10 @@ public class HealthCheckInitializationExtension implements Extension {
         HealthRegistry healthCheckRegistry = HealthRegistry.getInstance();
 
         if (configurationUtil.get("kumuluzee.health.checks.data-source-health-check").isPresent()) {
+            if(!DriverManager.getDrivers().hasMoreElements()){
+                LOG.severe("No database driver library appears to be provided.");
+            }
+
             healthCheckRegistry.register(DataSourceHealthCheck.class.getSimpleName(), new DataSourceHealthCheck());
         }
 
@@ -72,14 +80,32 @@ public class HealthCheckInitializationExtension implements Extension {
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
+            try {
+                Class.forName( "com.mongodb.MongoClient" );
+            } catch( ClassNotFoundException e ) {
+                LOG.severe("The required mongo-java-driver library appears to be missing.");
+            }
+
             healthCheckRegistry.register(MongoHealthCheck.class.getSimpleName(), new MongoHealthCheck());
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.rabbit-health-check").isPresent()) {
+            try {
+                Class.forName( "com.rabbitmq.client.Connection" );
+            } catch( ClassNotFoundException e ) {
+                LOG.severe("The required amqp-client library appears to be missing.");
+            }
+
             healthCheckRegistry.register(RabbitHealthCheck.class.getSimpleName(), new RabbitHealthCheck());
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.redis-health-check").isPresent()) {
+            try {
+                Class.forName( "redis.clients.jedis.JedisPool" );
+            } catch( ClassNotFoundException e ) {
+                LOG.severe("The required jedis library appears to be missing.");
+            }
+
             healthCheckRegistry.register(RedisHealthCheck.class.getSimpleName(), new RedisHealthCheck());
         }
 

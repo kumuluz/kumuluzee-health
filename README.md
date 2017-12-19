@@ -266,7 +266,7 @@ kumuluzee:
         connection-url: jdbc:mysql://localhost:3306/customers?user=mysql&password=mysql
 ```
 
-To enable data source availability health check, we also need to provide a database driver in pom.xml.
+To enable data source availability health check, we also need to provide a database driver library in pom.xml.
 
 Example configuration:
 
@@ -392,7 +392,7 @@ kumuluzee:
         connection-url: mongodb://user:password@localhost:27017/customers?serverSelectionTimeoutMS=2000
 ```
 
-To enable the Mongo database health check, we also need to provide mongo-java-driver in pom.xml.
+To enable the Mongo database health check, we also need to provide mongo-java-driver library in pom.xml.
 
 Example configuration:
 
@@ -418,7 +418,7 @@ kumuluzee:
         connection-url: amqp://guest:guest@localhost:5672/virtualHost?connection_timeout=2000
 ```
 
-To enable RabbitMQ health check, we also need to provide amqp-client in pom.xml.
+To enable RabbitMQ health check, we also need to provide amqp-client library in pom.xml.
 
 Example configuration:
 
@@ -444,7 +444,7 @@ kumuluzee:
         connection-url: redis://:secret@localhost:6379/0
 ```
 
-To enable Redis store health check, we also need to provide jedis in pom.xml.
+To enable Redis store health check, we also need to provide jedis library in pom.xml.
 
 Example configuration:
 
