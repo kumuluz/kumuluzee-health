@@ -64,7 +64,7 @@ public class HealthInitiator {
         dynamicRegistration.addMapping(servletMapping);
 
         // initialize health logger
-        if (configurationUtil.getBoolean("kumuluzee.metrics.logs.enabled").orElse(true)) {
+        if (configurationUtil.getBoolean("kumuluzee.health.logs.enabled").orElse(true)) {
             int period = configurationUtil.getInteger("kumuluzee.health.logs.period-s").orElse(60);
             String level = configurationUtil.get("kumuluzee.health.logs.level").orElse("FINE");
 
