@@ -266,6 +266,18 @@ kumuluzee:
         connection-url: jdbc:mysql://localhost:3306/customers?user=mysql&password=mysql
 ```
 
+To enable data source availability health check, we also need to provide a database driver in pom.xml.
+
+Example configuration:
+
+```xml
+<dependency>
+	<groupId>org.postgresql</groupId>
+	<artifactId>postgresql</artifactId>
+	<version>42.0.0</version>
+</dependency>
+```
+
 ### DiskSpaceHealthCheck
 
 To enable disk space health check, we need to provide the health check config parameters, listed below. The default disk space threshold is `100MB`, but can be overwritten by providing your own threshold.
@@ -380,6 +392,18 @@ kumuluzee:
         connection-url: mongodb://user:password@localhost:27017/customers?serverSelectionTimeoutMS=2000
 ```
 
+To enable the Mongo database health check, we also need to provide mongo-java-driver in pom.xml.
+
+Example configuration:
+
+```xml
+<dependency>
+	<groupId>org.mongodb</groupId>
+	<artifactId>mongo-java-driver</artifactId>
+	<version>3.5.0</version>
+</dependency>
+```
+
 ### RabbitHealthCheck
 
 To enable RabbitMQ health check, we need to specify the `connection-url` with port, username, password and virtual host as part of the health check configuration. The default connection-url is `amqp://guest:guest@localhost:5672?connection_timeout=2000`.
@@ -394,6 +418,18 @@ kumuluzee:
         connection-url: amqp://guest:guest@localhost:5672/virtualHost?connection_timeout=2000
 ```
 
+To enable RabbitMQ health check, we also need to provide amqp-client in pom.xml.
+
+Example configuration:
+
+```xml
+<dependency>
+	<groupId>com.rabbitmq</groupId>
+	<artifactId>amqp-client</artifactId>
+	<version>5.0.0</version>
+</dependency>
+```
+
 ### RedisHealthCheck
 
 To enable Redis store health check, we need to specify the `connection-url` with port, secret and database number as part of the health check configuration. The default connection-url is `redis://localhost:6379/0`.
@@ -406,6 +442,18 @@ kumuluzee:
     checks:
       redis-health-check:
         connection-url: redis://:secret@localhost:6379/0
+```
+
+To enable Redis store health check, we also need to provide jedis in pom.xml.
+
+Example configuration:
+
+```xml
+<dependency>
+	<groupId>redis.clients</groupId>
+	<artifactId>jedis</artifactId>
+	<version>2.9.0</version>
+</dependency>
 ```
 
 ## Changelog
