@@ -45,7 +45,7 @@ public class HealthCheckLogger implements Runnable {
 
     public HealthCheckLogger(String level) {
         this.mapper = new ObjectMapper().registerModule(new Jdk8Module());
-        this.LEVEL = Level.parse(level.toUpperCase());
+        LEVEL = Level.parse(level.toUpperCase());
     }
 
     @Override
