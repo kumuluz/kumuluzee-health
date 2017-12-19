@@ -40,7 +40,7 @@ public class MongoHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(MongoHealthCheck.class.getName());
 
-    // Default redis connection url
+    // Default mongo connection url
     private static final String DEFAULT_MONGO_URL = "mongodb://localhost:27017/local?serverSelectionTimeoutMS=2000";
 
     @Override
@@ -80,11 +80,11 @@ public class MongoHealthCheck implements HealthCheck {
      * @return
      */
     private Boolean databaseExist(MongoClient mongoClient, String databaseName) {
-        if (mongoClient != null && databaseName != null) {
-            MongoCursor<String> mongoCursor = mongoClient.listDatabaseNames().iterator();
 
-            while (mongoCursor.hasNext()) {
-                if (mongoCursor.next().equals(databaseName))
+        if (mongoClient != null && databaseName != null) {
+
+            for (String s : mongoClient.listDatabaseNames()) {
+                if (s.equals(databaseName))
                     return true;
             }
         }
