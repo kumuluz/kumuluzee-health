@@ -41,7 +41,7 @@ public class HealthRegistry {
     private ConcurrentMap<String, HealthCheck> healthChecks;
 
     private HealthRegistry() {
-        healthChecks = new ConcurrentHashMap<String, HealthCheck>();
+        healthChecks = new ConcurrentHashMap<>();
     }
 
     /**
@@ -83,7 +83,7 @@ public class HealthRegistry {
      * @return list of health check results
      */
     public List<HealthCheckResponse> getResults() {
-        return this.healthChecks.values().parallelStream().map(healthCheck -> healthCheck.call()).collect(Collectors
+        return this.healthChecks.values().parallelStream().map(HealthCheck::call).collect(Collectors
                 .toList());
     }
 }

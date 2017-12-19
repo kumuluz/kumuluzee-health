@@ -55,6 +55,7 @@ public class HealthCheckInitializationExtension implements Extension {
         HealthRegistry healthCheckRegistry = HealthRegistry.getInstance();
 
         if (configurationUtil.get("kumuluzee.health.checks.data-source-health-check").isPresent()) {
+
             if(!DriverManager.getDrivers().hasMoreElements()){
                 LOG.severe("No database driver library appears to be provided.");
             }
@@ -80,6 +81,7 @@ public class HealthCheckInitializationExtension implements Extension {
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
+
             try {
                 Class.forName( "com.mongodb.MongoClient" );
             } catch( ClassNotFoundException e ) {
@@ -90,6 +92,7 @@ public class HealthCheckInitializationExtension implements Extension {
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.rabbit-health-check").isPresent()) {
+
             try {
                 Class.forName( "com.rabbitmq.client.Connection" );
             } catch( ClassNotFoundException e ) {
@@ -100,6 +103,7 @@ public class HealthCheckInitializationExtension implements Extension {
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.redis-health-check").isPresent()) {
+
             try {
                 Class.forName( "redis.clients.jedis.JedisPool" );
             } catch( ClassNotFoundException e ) {
