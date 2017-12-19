@@ -53,7 +53,7 @@ public class RabbitHealthCheck implements HealthCheck {
             connection = factory.newConnection();
             return HealthCheckResponse.named(RabbitHealthCheck.class.getSimpleName()).up().build();
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "Connection to RabbitMQ couldn't be established.", exception);
+            LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to RabbitMQ.", exception);
             return HealthCheckResponse.named(RabbitHealthCheck.class.getSimpleName()).down().build();
         } finally {
             if (connection != null) {

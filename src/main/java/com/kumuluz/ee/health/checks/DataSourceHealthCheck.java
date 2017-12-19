@@ -47,14 +47,15 @@ public class DataSourceHealthCheck implements HealthCheck {
             connection = getConnection();
             return HealthCheckResponse.named(DataSourceHealthCheck.class.getSimpleName()).up().build();
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "Connection to data source couldn't be established.", exception);
+            LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to data source.",
+                    exception);
             return HealthCheckResponse.named(DataSourceHealthCheck.class.getSimpleName()).down().build();
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException exception) {
-                    LOG.log(Level.SEVERE, "An error occured when trying to close connection to data source.",
+                    LOG.log(Level.SEVERE, "An exception occurred when trying to close connection to data source.",
                             exception);
                 }
             }

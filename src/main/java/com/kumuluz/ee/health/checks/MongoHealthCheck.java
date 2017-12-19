@@ -60,7 +60,7 @@ public class MongoHealthCheck implements HealthCheck {
                 return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).down().build();
             }
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "Connection to Mongo couldn't be established.", exception);
+            LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to Mongo.", exception);
             return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).down().build();
         } finally {
             if (mongoClient != null) {

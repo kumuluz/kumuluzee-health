@@ -51,7 +51,7 @@ public class RedisHealthCheck implements HealthCheck {
             pool.getResource();
             return HealthCheckResponse.named(RedisHealthCheck.class.getSimpleName()).up().build();
         } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "Connection to Redis couldn't be established.", exception);
+            LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to Redis.", exception);
             return HealthCheckResponse.named(RedisHealthCheck.class.getSimpleName()).down().build();
         } finally {
             if (pool != null) {

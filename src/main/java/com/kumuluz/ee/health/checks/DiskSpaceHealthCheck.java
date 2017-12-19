@@ -24,7 +24,9 @@ import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -44,10 +46,15 @@ public class DiskSpaceHealthCheck implements HealthCheck {
                 .getLong("kumuluzee.health.checks.disk-space-health-check.threshold")
                 .orElse(DEFAULT_THRESHOLD);
 
-        if (new File("/").getFreeSpace() >= threshold) {
-            return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).up().build();
-        } else {
-            LOG.severe("Disk space is getting low.");
+        try {
+            if (Files.getFileStore(Paths.get("/")).getUsableSpace() >= threshold) {
+                return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).up().build();
+            } else {
+                LOG.severe("Disk space is getting low.");
+                return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).down().build();
+            }
+        } catch (Exception exception) {
+            LOG.log(Level.SEVERE, "An exception occurred when trying to read disk space.", exception);
             return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).down().build();
         }
     }
