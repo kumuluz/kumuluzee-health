@@ -59,7 +59,16 @@ public class HealthCheckInitializationExtension implements Extension {
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.elastic-search-health-check").isPresent()) {
-            healthCheckRegistry.register(ElasticSearchHealthCheck.class.getSimpleName(), new ElasticSearchHealthCheck());
+            healthCheckRegistry.register(ElasticSearchHealthCheck.class.getSimpleName(), new ElasticSearchHealthCheck
+                    ());
+        }
+
+        if (configurationUtil.get("kumuluzee.health.checks.etcd-health-check").isPresent()) {
+            healthCheckRegistry.register(EtcdHealthCheck.class.getSimpleName(), new EtcdHealthCheck());
+        }
+
+        if (configurationUtil.get("kumuluzee.health.checks.http-health-check").isPresent()) {
+            healthCheckRegistry.register(HttpHealthCheck.class.getSimpleName(), new HttpHealthCheck());
         }
 
         if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
@@ -72,14 +81,6 @@ public class HealthCheckInitializationExtension implements Extension {
 
         if (configurationUtil.get("kumuluzee.health.checks.redis-health-check").isPresent()) {
             healthCheckRegistry.register(RedisHealthCheck.class.getSimpleName(), new RedisHealthCheck());
-        }
-
-        if (configurationUtil.get("kumuluzee.health.checks.http-health-check").isPresent()) {
-            healthCheckRegistry.register(HttpHealthCheck.class.getSimpleName(), new HttpHealthCheck());
-        }
-
-        if (configurationUtil.get("kumuluzee.health.checks.etcd-health-check").isPresent()) {
-            healthCheckRegistry.register(HttpHealthCheck.class.getSimpleName(), new EtcdHealthCheck());
         }
 
         // register beans that implement health checks
