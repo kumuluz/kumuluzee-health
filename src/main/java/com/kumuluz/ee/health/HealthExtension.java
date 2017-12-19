@@ -36,6 +36,7 @@ import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
  */
 @EeExtensionDef(name = "Health", group = EeExtensionGroup.HEALTH)
 @EeComponentDependency(EeComponentType.CDI)
+@EeComponentDependency(EeComponentType.JAX_RS)
 public class HealthExtension implements Extension {
 
     @Override
