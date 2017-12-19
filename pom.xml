@@ -24,6 +24,13 @@
 
         <kumuluzee.version>2.4.1</kumuluzee.version>
 
+        <microprofile-health.version>1.0</microprofile-health.version>
+
+        <jackson.version>2.8.10</jackson.version>
+        <jedis.version>2.9.0</jedis.version>
+        <mongo-driver.version>3.5.0</mongo-driver.version>
+        <ampq-client.version>5.0.0</ampq-client.version>
+
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
         <nexus.staging.plugin.version>1.6.8</nexus.staging.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
@@ -90,31 +97,31 @@
         <dependency>
             <groupId>org.eclipse.microprofile.health</groupId>
             <artifactId>microprofile-health-api</artifactId>
-            <version>1.0</version>
+            <version>${microprofile-health.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
-            <version>2.8.10</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <!-- clients -->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
+            <version>${jedis.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
-            <version>3.5.0</version>
+            <version>${mongo-driver.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
-            <version>5.0.0</version>
+            <version>${ampq-client.version}</version>
             <optional>true</optional>
         </dependency>
     </dependencies>
