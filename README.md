@@ -1,7 +1,7 @@
 # KumuluzEE Health
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-health/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-health)
 
-> KumuluzEE Health extension provides consistent, unified way of performing microservice health checks and exposing health information.
+> KumuluzEE Health project provides consistent, unified way of performing microservice health checks and exposing health information.
 
 KumuluzEE Health is a health check project for the KumuluzEE microservice framework. It provides easy, consistent and unified way of performing health checking on microservices and exposing health information to be used by monitoring and container orchestration environments such as Kubernetes. KumuluzEE Health is fully compliant with Kubernetes and has been extensively tested to work in Kubernetes.
 
