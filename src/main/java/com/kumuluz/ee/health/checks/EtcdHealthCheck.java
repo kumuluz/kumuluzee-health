@@ -42,7 +42,7 @@ public class EtcdHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(EtcdHealthCheck.class.getName());
 
-    private static final String HEALTHY = "{\"health\": \"true\"}";
+    private static final String HEALTHY = "{\"health\":\"true\"}";
 
     @Override
     public HealthCheckResponse call() {
@@ -73,7 +73,7 @@ public class EtcdHealthCheck implements HealthCheck {
             response = webTarget.request().get();
 
             if (response.getStatus() == 200) {
-                String result = response.readEntity(String.class);
+                String result = response.readEntity(String.class).replaceAll("\\s+", "");
 
                 if (result != null && result.equals(HEALTHY)) {
                     healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.State.UP.toString());
