@@ -22,7 +22,6 @@ package com.kumuluz.ee.health;
 
 import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.core.spi.LoadableExtension;
-import org.jboss.arquillian.test.spi.enricher.resource.ResourceProvider;
 
 /**
  * Registers {@link HealthLibraryAppender} and {@link URIProvider} with the Arquillian.
@@ -35,6 +34,5 @@ public class HealthArquillianExtension implements LoadableExtension {
     @Override
     public void register(ExtensionBuilder extensionBuilder) {
         extensionBuilder.service(AuxiliaryArchiveAppender.class, HealthLibraryAppender.class);
-        extensionBuilder.service(ResourceProvider.class, URIProvider.class);
     }
 }
