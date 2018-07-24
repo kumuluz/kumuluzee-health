@@ -17,16 +17,15 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health;
 
 import com.kumuluz.ee.common.Extension;
 import com.kumuluz.ee.common.config.EeConfig;
-import com.kumuluz.ee.common.dependencies.EeComponentDependency;
-import com.kumuluz.ee.common.dependencies.EeComponentType;
-import com.kumuluz.ee.common.dependencies.EeExtensionDef;
-import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
+import com.kumuluz.ee.common.dependencies.*;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
+
+import java.util.logging.Logger;
 
 /**
  * KumuluzEE Health extension.
@@ -35,9 +34,13 @@ import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
  * @since 1.0.0
  */
 @EeExtensionDef(name = "Health", group = EeExtensionGroup.HEALTH)
-@EeComponentDependency(EeComponentType.CDI)
-@EeComponentDependency(EeComponentType.JAX_RS)
+@EeComponentDependencies({
+        @EeComponentDependency(EeComponentType.CDI),
+        @EeComponentDependency(EeComponentType.JAX_RS)
+})
 public class HealthExtension implements Extension {
+
+    private static final Logger log = Logger.getLogger(HealthExtension.class.getName());
 
     @Override
     public void load() {
@@ -45,5 +48,6 @@ public class HealthExtension implements Extension {
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
+        log.info("Initialising health extension.");
     }
 }

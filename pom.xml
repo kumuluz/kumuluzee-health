@@ -32,7 +32,7 @@
         <ampq-client.version>5.0.0</ampq-client.version>
 
         <testng.version>6.9.9</testng.version>
-        <kumuluzee-arquillian-container.version>1.0.0-SNAPSHOT</kumuluzee-arquillian-container.version>
+        <kumuluzee-arquillian-container.version>1.0.0</kumuluzee-arquillian-container.version>
         <httpclient.version>4.5.2</httpclient.version>
 
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
