@@ -458,7 +458,7 @@ Example configuration:
 
 ## Changelog
 
-Recent changes can be viewed on Github on the [Releases Page](https://github.com/TFaga/KumuluzEE/releases)
+Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-health/releases)
 
 ## Contribute
 
