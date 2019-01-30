@@ -400,7 +400,7 @@ Example configuration:
 <dependency>
 	<groupId>org.mongodb</groupId>
 	<artifactId>mongo-java-driver</artifactId>
-	<version>3.5.0</version>
+	<version>3.9.1</version>
 </dependency>
 ```
 
@@ -426,7 +426,7 @@ Example configuration:
 <dependency>
 	<groupId>com.rabbitmq</groupId>
 	<artifactId>amqp-client</artifactId>
-	<version>5.0.0</version>
+	<version>5.6.0</version>
 </dependency>
 ```
 
@@ -452,7 +452,7 @@ Example configuration:
 <dependency>
 	<groupId>redis.clients</groupId>
 	<artifactId>jedis</artifactId>
-	<version>2.9.0</version>
+	<version>3.0.1</version>
 </dependency>
 ```
 
