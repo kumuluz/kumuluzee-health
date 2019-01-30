@@ -18,21 +18,34 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.kumuluz.ee.health;
+package com.kumuluz.ee.health.tests;
 
-import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
-import org.jboss.arquillian.core.spi.LoadableExtension;
+import org.eclipse.microprofile.health.tck.SimpleHttp;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
- * Registers {@link HealthLibraryAppender} with the Arquillian.
+ * Extension disable test.
  *
  * @author Urban Malc
- * @since 1.1.0
+ * @since 1.0.2
  */
-public class HealthArquillianExtension implements LoadableExtension {
+public class ExtensionDisabledTest extends SimpleHttp {
 
-    @Override
-    public void register(ExtensionBuilder extensionBuilder) {
-        extensionBuilder.service(AuxiliaryArchiveAppender.class, HealthLibraryAppender.class);
+    @Deployment
+    public static JavaArchive createDeployment() {
+        return ShrinkWrap.create(JavaArchive.class)
+                .addAsResource("disabled-config.yml", "config.yml");
+    }
+
+    @Test
+    @RunAsClient
+    public void servletDisabledTest() {
+        Response response = getUrlContents();
+        Assert.assertEquals(response.getStatus(), 404);
     }
 }

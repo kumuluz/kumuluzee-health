@@ -41,7 +41,7 @@ public class KumuluzHealthCheckResponseBuilder extends HealthCheckResponseBuilde
     private HealthCheckResponse.State state;
 
     public KumuluzHealthCheckResponseBuilder() {
-        this.data = new HashMap<String, Object>();
+        this.data = new HashMap<>();
     }
 
     @Override
