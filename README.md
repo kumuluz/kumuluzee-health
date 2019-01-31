@@ -220,6 +220,11 @@ kumuluzee:
       period-s: 60
 ```
 
+## Disabling health extension
+
+Health extension can be disabled by setting the configuration property `kumuluzee.health.enabled` to `false`. This will
+disable the `/health` endpoint and disable health check logging.
+
 ## Configuring built-in health checks
 
 To configure built-in health checks, we can use the configuration parameters listed below for each built-in health check.
