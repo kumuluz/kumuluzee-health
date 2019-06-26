@@ -17,7 +17,7 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,10 +48,10 @@ public class HealthServlet extends HttpServlet {
 
     private static final Logger LOG = Logger.getLogger(HealthServlet.class.getName());
 
-    private ConfigurationUtil configurationUtil;
-    private HealthRegistry healthCheckRegistry;
+    private static ConfigurationUtil configurationUtil;
+    private static HealthRegistry healthCheckRegistry;
 
-    private ObjectMapper mapper;
+    private static ObjectMapper mapper;
 
     public void init() throws ServletException {
         this.configurationUtil = ConfigurationUtil.getInstance();
@@ -59,7 +59,7 @@ public class HealthServlet extends HttpServlet {
         this.mapper = new ObjectMapper().registerModule(new Jdk8Module());
     }
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
 
         ServletOutputStream output = null;
@@ -98,7 +98,11 @@ public class HealthServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             if (output != null) {
-                output.close();
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    LOG.severe("Cannot close output stream: " + e.getMessage());
+                }
             }
         }
     }
