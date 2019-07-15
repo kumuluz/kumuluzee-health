@@ -1,9 +1,13 @@
 # KumuluzEE Health
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-health/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-health)
 
-> KumuluzEE Health project provides consistent, unified way of performing microservice health checks and exposing health information.
+> KumuluzEE Health project provides consistent, unified way of performing microservice health checks and exposing health
+  information.
 
-KumuluzEE Health is a health check project for the KumuluzEE microservice framework. It provides easy, consistent and unified way of performing health checking on microservices and exposing health information to be used by monitoring and container orchestration environments such as Kubernetes. KumuluzEE Health is fully compliant with Kubernetes and has been extensively tested to work in Kubernetes.
+KumuluzEE Health is a health check project for the KumuluzEE microservice framework. It provides easy, consistent and
+unified way of performing health checking on microservices and exposing health information to be used by monitoring and
+container orchestration environments such as Kubernetes. KumuluzEE Health is fully compliant with Kubernetes and has
+been extensively tested to work in Kubernetes.
 
 KumuluzEE Health is compliant with the [MicroProfile Service Health Checks specification 1.0]( https://github.com/eclipse/microprofile-health).
 
@@ -20,7 +24,8 @@ You can enable the KumuluzEE Health module by adding the following dependencies:
 </dependency>
 ```
 
-CDI dependency is a prerequisite. Please refer to KumuluzEE [readme]( https://github.com/kumuluz/kumuluzee/) for more information. 
+CDI dependency is a prerequisite. Please refer to KumuluzEE [readme](https://github.com/kumuluz/kumuluzee/) for more
+information. 
 
 ## Health checks
 
@@ -49,7 +54,8 @@ There are two ways how we can implement a custom health check.
 
 ### @Health annotation
 
-To implement health checks using `@Health` annotation, we have to implement a CDI bean class, which implements the `HealthCheck` interface. Such health checks are automatically discovered and registered to the `HealthRegistry`.
+To implement health checks using `@Health` annotation, we have to implement a CDI bean class, which implements the
+`HealthCheck` interface. Such health checks are automatically discovered and registered to the `HealthRegistry`.
 
 Shown below is an example of a CDI bean health check using `@Health` annotation:
 
@@ -73,7 +79,8 @@ public class SuccessfulHealthCheckBean implements HealthCheck {
 
 ### Health check implemented as class
 
-To implement a health check with a custom class, the class has to implement the `HealthCheck` interface. Such class has to be manually registered with the `HealthRegistry`.
+To implement a health check with a custom class, the class has to implement the `HealthCheck` interface. Such class has
+to be manually registered with the `HealthRegistry`.
 
 Shown below is a custom health check implementation. It checks if the KumuluzEE GitHub page is accessible. 
 
@@ -110,7 +117,8 @@ public class GithubHealthCheck implements HealthCheck {
 
 ### Registering custom health checks
 
-To register a custom health check class we have to use the `HealthRegistry` instance. We provide the health check unique name and an instance of the health check class.
+To register a custom health check class we have to use the `HealthRegistry` instance. We provide the health check unique
+name and an instance of the health check class.
 
 ```java
 HealthRegistry.getInstance().register(GithubHealthCheck.class.getSimpleName(), new GithubHealthCheck());
@@ -126,7 +134,8 @@ HealthRegistry.getInstance().unregister(GithubHealthCheck.class.getSimpleName())
 
 ## Retrieving health check results
 
-To invoke the health check and retrieve the result we can use the `HealthRegistry` instance. The results will be returned in a list of health check responses.
+To invoke the health check and retrieve the result we can use the `HealthRegistry` instance. The results will be
+returned in a list of health check responses.
 
 ```java
 List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
@@ -135,6 +144,7 @@ List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
 ## /health endpoint output
 
 The `/health` endpoint output returns:
+
 - 200 with payload, when health checks are defined with positive status or are not defined
 - 503 with payload, when health checks are defined, but at least one status is negative
 - 500 without payload, when an exception occurred in the procedure of health checking
@@ -178,7 +188,8 @@ The health check is available on http://IP:PORT/health by default, payload examp
 }
 ```
 
-The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
+The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single
+line response, payload example is provided below:
 
 ```json
 {"status":"UP","checks":[{"name":"DataSourceHealthCheck","status":"UP"},{"name":"DiskSpaceHealthCheck","status":"UP"},{"name":"ElasticSearchHealthCheck","status":"UP"},{"name":"EtcdHealthCheck","status":"UP","data":{"http://localhost:2379": "UP"}},{"name":"HttpHealthCheck","status":"UP","data":{"https://github.com/kumuluz/kumuluzee-health":"UP"}},{"name":"MongoHealthCheck","status":"UP"},{"name":"RabbitHealthCheck","status":"UP"},{"name":"RedisHealthCheck","status":"UP"}]}
@@ -186,9 +197,12 @@ The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pre
 
 ## Configuring health check endpoint
 
-Health check is provided via URL, the health servlet is registered automatically on path `/health`. To configure the health check endpoint, you can specify the following configuration keys: 
+Health check is provided via URL, the health servlet is registered automatically on path `/health`. To configure the
+health check endpoint, you can specify the following configuration keys:
+
 - `kumuluzee.health.servlet.mapping`: Health servlet path. Default value is `/health`.
-- `kumuluzee.health.servlet.enabled`: Is JSON output enabled. Default value is `true`. If false only the status codes will be provided.
+- `kumuluzee.health.servlet.enabled`: Is JSON output enabled. Default value is `true`. If false only the status codes
+  will be provided.
 
 The JSON output will also be enabled if the DEBUG mode is enabled, by setting `kumuluz.debug` to true.
 
@@ -204,7 +218,9 @@ kumuluzee:
 
 ## Enabling health check logging
 
-Periodic logging of health check results is also available. To configure the health check results logging, you can specify the following configuration keys:
+Periodic logging of health check results is also available. To configure the health check results logging, you can
+specify the following configuration keys:
+
 - `kumuluzee.health.logs.enabled`: Is logging enabled. Default value is `true`.
 - `kumuluzee.health.logs.level`: The logging level. Default value is `FINE`.
 - `kumuluzee.health.logs.period-s`: The logging period in seconds. Default value is `60`.
@@ -231,7 +247,8 @@ To configure built-in health checks, we can use the configuration parameters lis
 
 ### DataSourceHealthCheck
 
-To enable data source availability health check, we need to provide in the health check sections. `Jndi-name`, `connection-url`, `username` and `password` need to be provided as part of the health check configuration.
+To enable data source availability health check, we need to provide in the health check sections. `Jndi-name`,
+`connection-url`, `username` and `password` need to be provided as part of the health check configuration.
 
 Example configuration:
 
@@ -285,7 +302,8 @@ Example configuration:
 
 ### DiskSpaceHealthCheck
 
-To enable disk space health check, we need to provide the health check config parameters, listed below. The default disk space threshold is `100MB`, but can be overwritten by providing your own threshold.
+To enable disk space health check, we need to provide the health check config parameters, listed below. The default disk
+space threshold is `100MB`, but can be overwritten by providing your own threshold.
 
 Example of the configuration:
 
@@ -299,7 +317,9 @@ kumuluzee:
 
 ### ElasticSearchHealthCheck
 
-To enable Elasticsearch cluster health check, we need to specify the `connection-url` with cluster health check endpoint as part of the health check configuration. The cluster health check endpoint is typically available on `http://HOST:IP/_cluster/health`. The response should resemble:
+To enable Elasticsearch cluster health check, we need to specify the `connection-url` with cluster health check endpoint
+as part of the health check configuration. The cluster health check endpoint is typically available on
+`http://HOST:IP/_cluster/health`. The response should resemble:
 
 ```json
 {
@@ -321,7 +341,8 @@ To enable Elasticsearch cluster health check, we need to specify the `connection
 }
 ```
 
-ElasticSearchHealthCheck checks if the status of HTTP response is 200 and if status field is either `green` or `yellow`. The default connection-url is `http://localhost:9200/_cluster/health`.
+ElasticSearchHealthCheck checks if the status of HTTP response is 200 and if status field is either `green` or `yellow`.
+The default connection-url is `http://localhost:9200/_cluster/health`.
 
 Example of the configuration:
 
@@ -335,7 +356,8 @@ kumuluzee:
 
 ### EtcdHealthCheck
 
-To enable etcd health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration.
+To enable etcd health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health
+check configuration.
 
 Example configuration:
 
@@ -360,7 +382,9 @@ kumuluzee:
 
 ### HttpHealthCheck
 
-We can provide single or multiple urls for HTTP availability health check. To enable HTTP availability health check, we need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration. During the http health check HEAD requests are made to all the `connection-url` and status code is verified if its >=200 and <300.
+We can provide single or multiple urls for HTTP availability health check. To enable HTTP availability health check, we
+need to specify the `connection-url` or multiple `connection-url` as part of the health check configuration. During the
+http health check HEAD requests are made to all the `connection-url` and status code is verified if its >=200 and <300.
 
 Example configuration:
 
@@ -385,7 +409,10 @@ kumuluzee:
 
 ### MongoHealthCheck
 
-To enable the Mongo database health check, we need to provide the `connection-url` config parameter with user, password, database name and other options need to be provided as part of the health check configuration as described in the [mongo-java-driver-documentation](https://mongodb.github.io/mongo-java-driver/3.5/javadoc/com/mongodb/MongoClientURI.html). The default connection-url is `mongodb://localhost:27017/local?serverSelectionTimeoutMS=2000`.
+To enable the Mongo database health check, we need to provide the `connection-url` config parameter with user, password,
+database name and other options need to be provided as part of the health check configuration as described in the
+[mongo-java-driver-documentation](https://mongodb.github.io/mongo-java-driver/3.5/javadoc/com/mongodb/MongoClientURI.html).
+The default connection-url is `mongodb://localhost:27017/local?serverSelectionTimeoutMS=2000`.
 
 Example of the configuration:
 
@@ -411,7 +438,9 @@ Example configuration:
 
 ### RabbitHealthCheck
 
-To enable RabbitMQ health check, we need to specify the `connection-url` with port, username, password and virtual host as part of the health check configuration. The default connection-url is `amqp://guest:guest@localhost:5672?connection_timeout=2000`.
+To enable RabbitMQ health check, we need to specify the `connection-url` with port, username, password and virtual host
+as part of the health check configuration. The default connection-url is
+`amqp://guest:guest@localhost:5672?connection_timeout=2000`.
 
 Example of the configuration:
 
@@ -437,7 +466,8 @@ Example configuration:
 
 ### RedisHealthCheck
 
-To enable Redis store health check, we need to specify the `connection-url` with port, secret and database number as part of the health check configuration. The default connection-url is `redis://localhost:6379/0`.
+To enable Redis store health check, we need to specify the `connection-url` with port, secret and database number as
+part of the health check configuration. The default connection-url is `redis://localhost:6379/0`.
 
 Example of the configuration:
 
