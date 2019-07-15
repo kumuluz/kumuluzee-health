@@ -38,6 +38,11 @@ KumuluzEE Health differentiates between two health check types - liveness and re
 liveness check fails it means that the service is stuck and should be restarted. If a readiness check fails it means
 that the service is temporary unavailable and should not receive requests until all readiness checks succeed.
 
+For more information on liveness and readiness see the following Kubernetes articles:
+
+- [Configure Liveness and Readiness Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)
+- [Container probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
+
 ## Built-in health checks
 
 The following health checks are available out-of-the-box: 
