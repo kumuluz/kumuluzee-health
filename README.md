@@ -233,6 +233,8 @@ Periodic logging of health check results is also available. To configure the hea
 specify the following configuration keys:
 
 - `kumuluzee.health.logs.enabled`: Is logging enabled. Default value is `true`.
+- `kumuluzee.health.logs.type`: Type of health checks to be logged. Allowed values: `both`, `readiness`, `liveness`.
+  Default value is `both`.
 - `kumuluzee.health.logs.level`: The logging level. Default value is `FINE`.
 - `kumuluzee.health.logs.period-s`: The logging period in seconds. Default value is `60`.
 
@@ -243,6 +245,7 @@ kumuluzee:
   health:
     logs:
       enabled: true
+      type: readiness
       level: FINE
       period-s: 60
 ```
@@ -256,8 +259,8 @@ disable the `/health` endpoint and disable health check logging.
 
 To configure built-in health checks, we can use the configuration parameters listed below for each built-in health check.
 Every built-in health check supports a configuration key `type` which specifies under which type the health check should
-be registered. Allowed values are `liveness` and `readiness`. Default value is `readiness`. For example see the below
-configuration of _DataSourceHealthCheck_. 
+be registered. Allowed values are `liveness`, `readiness` and `both`. Default value is `readiness`. For example see the
+below configuration of _DataSourceHealthCheck_. 
 
 ### DataSourceHealthCheck
 

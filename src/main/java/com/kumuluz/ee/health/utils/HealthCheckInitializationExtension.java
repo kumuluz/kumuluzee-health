@@ -159,10 +159,14 @@ public class HealthCheckInitializationExtension implements Extension {
     private HealthCheckType getHealthCheckType(String configKeyPrefix) {
         String type = ConfigurationUtil.getInstance().get(configKeyPrefix + ".type").orElse("readiness");
 
-        if (type.equalsIgnoreCase("liveness")) {
-            return HealthCheckType.LIVENESS;
+        HealthCheckType parsedType = HealthCheckType.parse(type);
+
+        if (parsedType == null) {
+            LOG.severe("Type of the health check " + configKeyPrefix + " is invalid (" + type + "). Using the " +
+                    "default type: readiness.");
+            parsedType = HealthCheckType.READINESS;
         }
 
-        return HealthCheckType.READINESS;
+        return parsedType;
     }
 }

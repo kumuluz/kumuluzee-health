@@ -43,16 +43,23 @@ public class HealthCheckLogger implements Runnable {
     private static Level LEVEL;
 
     private ObjectMapper mapper;
+    private HealthCheckType type;
 
-    public HealthCheckLogger(String level) {
+    public HealthCheckLogger(String level, HealthCheckType type) {
         this.mapper = new ObjectMapper().registerModule(new Jdk8Module());
+
+        if (type == null) {
+            type = HealthCheckType.BOTH;
+        }
+
+        this.type = type;
         LEVEL = Level.parse(level.toUpperCase());
     }
 
     @Override
     public void run() {
         try {
-            List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults(HealthCheckType.BOTH);
+            List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults(type);
 
             HealthResponse healthResponse = new HealthResponse();
             healthResponse.setChecks(results);

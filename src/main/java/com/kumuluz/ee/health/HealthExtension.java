@@ -27,6 +27,7 @@ import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.common.dependencies.*;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.enums.HealthCheckType;
 import com.kumuluz.ee.health.logs.HealthCheckLogger;
 
 import java.util.Collections;
@@ -94,11 +95,12 @@ public class HealthExtension implements Extension {
         if (configurationUtil.getBoolean("kumuluzee.health.logs.enabled").orElse(true)) {
             int period = configurationUtil.getInteger("kumuluzee.health.logs.period-s").orElse(60);
             String level = configurationUtil.get("kumuluzee.health.logs.level").orElse("FINE");
+            String type = configurationUtil.get("kumuluzee.health.logs.type").orElse("both");
 
             scheduler = Executors.newScheduledThreadPool(1);
             LOG.log(Level.INFO, "Starting health logger to log health check results every {0} s", period);
 
-            HealthCheckLogger logger = new HealthCheckLogger(level);
+            HealthCheckLogger logger = new HealthCheckLogger(level, HealthCheckType.parse(type));
             scheduler.scheduleWithFixedDelay(logger, period, period, TimeUnit.SECONDS);
         }
     }

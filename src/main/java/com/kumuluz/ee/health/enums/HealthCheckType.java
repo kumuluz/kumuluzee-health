@@ -30,5 +30,17 @@ public enum HealthCheckType {
 
     LIVENESS,
     READINESS,
-    BOTH
+    BOTH;
+
+    public static HealthCheckType parse(String e) {
+        if (e.equalsIgnoreCase("liveness")) {
+            return LIVENESS;
+        } else if (e.equalsIgnoreCase("readiness")) {
+            return READINESS;
+        } else if (e.equalsIgnoreCase("both")) {
+            return BOTH;
+        } else {
+            return null;
+        }
+    }
 }
