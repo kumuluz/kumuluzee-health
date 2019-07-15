@@ -24,14 +24,14 @@
 
         <jaxb-api.version>2.3.1</jaxb-api.version>
 
-        <kumuluzee.version>3.3.0</kumuluzee.version>
+        <kumuluzee.version>3.5.0</kumuluzee.version>
 
         <microprofile-health.version>2.0.1</microprofile-health.version>
 
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
         <jedis.version>3.0.1</jedis.version>
-        <mongo-driver.version>3.10.1</mongo-driver.version>
-        <ampq-client.version>5.6.0</ampq-client.version>
+        <mongo-driver.version>3.10.2</mongo-driver.version>
+        <amqp-client.version>5.7.2</amqp-client.version>
 
         <testng.version>6.9.9</testng.version>
         <kumuluzee-arquillian-container.version>1.1.0</kumuluzee-arquillian-container.version>
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
-            <version>${ampq-client.version}</version>
+            <version>${amqp-client.version}</version>
             <optional>true</optional>
         </dependency>
 
