@@ -23,6 +23,7 @@ package com.kumuluz.ee.health.logs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.kumuluz.ee.health.HealthRegistry;
+import com.kumuluz.ee.health.enums.HealthCheckType;
 import com.kumuluz.ee.health.models.HealthResponse;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
@@ -51,11 +52,11 @@ public class HealthCheckLogger implements Runnable {
     @Override
     public void run() {
         try {
-            List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
+            List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults(HealthCheckType.BOTH);
 
             HealthResponse healthResponse = new HealthResponse();
             healthResponse.setChecks(results);
-            healthResponse.setOutcome(
+            healthResponse.setStatus(
                     results.stream().anyMatch(result -> result.getState().equals(HealthCheckResponse.State.DOWN)) ?
                             HealthCheckResponse.State.DOWN : HealthCheckResponse.State.UP);
 

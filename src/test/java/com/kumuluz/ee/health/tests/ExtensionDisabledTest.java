@@ -20,13 +20,21 @@
  */
 package com.kumuluz.ee.health.tests;
 
-import org.eclipse.microprofile.health.tck.SimpleHttp;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.net.URI;
 
 /**
  * Extension disable test.
@@ -34,7 +42,10 @@ import org.testng.annotations.Test;
  * @author Urban Malc
  * @since 1.0.2
  */
-public class ExtensionDisabledTest extends SimpleHttp {
+public class ExtensionDisabledTest extends Arquillian {
+
+    @ArquillianResource
+    private URI uri;
 
     @Deployment
     public static JavaArchive createDeployment() {
@@ -44,8 +55,11 @@ public class ExtensionDisabledTest extends SimpleHttp {
 
     @Test
     @RunAsClient
-    public void servletDisabledTest() {
-        Response response = getUrlContents();
-        Assert.assertEquals(response.getStatus(), 404);
+    public void servletDisabledTest() throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpResponse response = client.execute(new HttpGet(uri + "/health"));
+        int code = response.getStatusLine().getStatusCode();
+
+        Assert.assertEquals(code, 404);
     }
 }

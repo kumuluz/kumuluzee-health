@@ -17,44 +17,33 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
-package com.kumuluz.ee.health.models;
+ */
+package com.kumuluz.ee.health.utils;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import org.eclipse.microprofile.health.HealthCheckResponse;
-
-import java.util.List;
+import com.kumuluz.ee.health.enums.HealthCheckType;
+import org.eclipse.microprofile.health.HealthCheck;
 
 /**
- * Health response class.
+ * Wraps together a {@link HealthCheck} with its type ({@link HealthCheckType}).
  *
- * @author Marko Škrjanec
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 2.0.0
  */
-@JsonInclude(Include.NON_NULL)
-public class HealthResponse {
+public class HealthCheckWrapper {
 
-    private HealthCheckResponse.State status;
+    private HealthCheckType type;
+    private HealthCheck healthCheck;
 
-    private List<HealthCheckResponse> checks;
-
-    public HealthResponse() {
+    public HealthCheckWrapper(HealthCheckType type, HealthCheck healthCheck) {
+        this.type = type;
+        this.healthCheck = healthCheck;
     }
 
-    public HealthCheckResponse.State getStatus() {
-        return status;
+    public HealthCheckType getType() {
+        return type;
     }
 
-    public void setStatus(HealthCheckResponse.State status) {
-        this.status = status;
-    }
-
-    public List<HealthCheckResponse> getChecks() {
-        return checks;
-    }
-
-    public void setChecks(List<HealthCheckResponse> checks) {
-        this.checks = checks;
+    public HealthCheck getHealthCheck() {
+        return healthCheck;
     }
 }

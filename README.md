@@ -135,45 +135,45 @@ List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
 ## /health endpoint output
 
 The `/health` endpoint output returns:
-- 200 with payload, when health checks are defined with positive outcome or are not defined
-- 503 with payload, when health checks are defined, but at least one outcome is negative
+- 200 with payload, when health checks are defined with positive status or are not defined
+- 503 with payload, when health checks are defined, but at least one status is negative
 - 500 without payload, when an exception occurred in the procedure of health checking
 
 The health check is available on http://IP:PORT/health by default, payload example is provided below:
 
 ```json
 {
-  "outcome" : "UP",
+  "status" : "UP",
   "checks" : [ {
     "name" : "DataSourceHealthCheck",
-    "state" : "UP"
+    "status" : "UP"
   }, {
     "name" : "DiskSpaceHealthCheck",
-    "state" : "UP"
+    "status" : "UP"
   }, {
     "name" : "ElasticSearchHealthCheck",
-    "state" : "UP"
+    "status" : "UP"
   }, {
     "name" : "EtcdHealthCheck",
-    "state" : "UP",
+    "status" : "UP",
     "data": {
       "http://localhost:2379": "UP" 
     }
   }, {
     "name" : "HttpHealthCheck",
-    "state" : "UP",
+    "status" : "UP",
     "data": {
       "https://github.com/kumuluz/kumuluzee-health": "UP"
     }
   }, {
     "name" : "MongoHealthCheck",
-    "state" : "UP"
+    "status" : "UP"
   }, {
     "name" : "RabbitHealthCheck",
-    "state" : "UP"
+    "status" : "UP"
   }, {
     "name" : "RedisHealthCheck",
-    "state" : "UP"
+    "status" : "UP"
   } ]
 }
 ```
@@ -181,7 +181,7 @@ The health check is available on http://IP:PORT/health by default, payload examp
 The URL also accepts a query parameter `pretty=false` (http://IP:PORT/health?pretty=false) which results in a single line response, payload example is provided below:
 
 ```json
-{"outcome":"UP","checks":[{"name":"DataSourceHealthCheck","state":"UP"},{"name":"DiskSpaceHealthCheck","state":"UP"},{"name":"ElasticSearchHealthCheck","state":"UP"},{"name":"EtcdHealthCheck","state":"UP","data":{"http://localhost:2379": "UP"}},{"name":"HttpHealthCheck","state":"UP","data":{"https://github.com/kumuluz/kumuluzee-health":"UP"}},{"name":"MongoHealthCheck","state":"UP"},{"name":"RabbitHealthCheck","state":"UP"},{"name":"RedisHealthCheck","state":"UP"}]}
+{"status":"UP","checks":[{"name":"DataSourceHealthCheck","status":"UP"},{"name":"DiskSpaceHealthCheck","status":"UP"},{"name":"ElasticSearchHealthCheck","status":"UP"},{"name":"EtcdHealthCheck","status":"UP","data":{"http://localhost:2379": "UP"}},{"name":"HttpHealthCheck","status":"UP","data":{"https://github.com/kumuluz/kumuluzee-health":"UP"}},{"name":"MongoHealthCheck","status":"UP"},{"name":"RabbitHealthCheck","status":"UP"},{"name":"RedisHealthCheck","status":"UP"}]}
 ```
 
 ## Configuring health check endpoint

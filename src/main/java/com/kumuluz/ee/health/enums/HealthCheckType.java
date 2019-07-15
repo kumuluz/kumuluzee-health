@@ -17,44 +17,18 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
-package com.kumuluz.ee.health.models;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import org.eclipse.microprofile.health.HealthCheckResponse;
-
-import java.util.List;
+ */
+package com.kumuluz.ee.health.enums;
 
 /**
- * Health response class.
+ * Represents type of the health check.
  *
- * @author Marko Škrjanec
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 2.0.0
  */
-@JsonInclude(Include.NON_NULL)
-public class HealthResponse {
+public enum HealthCheckType {
 
-    private HealthCheckResponse.State status;
-
-    private List<HealthCheckResponse> checks;
-
-    public HealthResponse() {
-    }
-
-    public HealthCheckResponse.State getStatus() {
-        return status;
-    }
-
-    public void setStatus(HealthCheckResponse.State status) {
-        this.status = status;
-    }
-
-    public List<HealthCheckResponse> getChecks() {
-        return checks;
-    }
-
-    public void setChecks(List<HealthCheckResponse> checks) {
-        this.checks = checks;
-    }
+    LIVENESS,
+    READINESS,
+    BOTH
 }

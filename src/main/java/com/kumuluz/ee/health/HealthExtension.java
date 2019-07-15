@@ -29,6 +29,7 @@ import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.health.logs.HealthCheckLogger;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -72,12 +73,22 @@ public class HealthExtension implements Extension {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
         // initialize servlet mapping
-        String servletMapping = configurationUtil.get("kumuluzee.health.servlet.mapping").orElse("/health");
+        String servletMapping = configurationUtil.get("kumuluzee.health.servlet.mapping").orElse("/health/*");
+
+        if (!servletMapping.endsWith("/*")) {
+            if (servletMapping.endsWith("/")) {
+                servletMapping += "*";
+            } else {
+                servletMapping += "/*";
+            }
+        }
 
         LOG.info("Registering health servlet on " + servletMapping);
 
         // register servlet
-        ((ServletServer) server).registerServlet(HealthServlet.class, servletMapping);
+        ((ServletServer) server).registerServlet(HealthServlet.class, servletMapping,
+                Collections.singletonMap("com.kumuluz.ee.health.servletMapping",
+                        servletMapping.substring(0, servletMapping.length() - 2)));
 
         // initialize health logger
         if (configurationUtil.getBoolean("kumuluzee.health.logs.enabled").orElse(true)) {

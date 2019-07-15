@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.enums.HealthCheckType;
 import com.kumuluz.ee.health.models.HealthResponse;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
@@ -53,10 +54,13 @@ public class HealthServlet extends HttpServlet {
 
     private static ObjectMapper mapper;
 
+    private String servletMapping;
+
     public void init() throws ServletException {
-        this.configurationUtil = ConfigurationUtil.getInstance();
-        this.healthCheckRegistry = HealthRegistry.getInstance();
-        this.mapper = new ObjectMapper().registerModule(new Jdk8Module());
+        configurationUtil = ConfigurationUtil.getInstance();
+        healthCheckRegistry = HealthRegistry.getInstance();
+        mapper = new ObjectMapper().registerModule(new Jdk8Module());
+        servletMapping = getInitParameter("com.kumuluz.ee.health.servletMapping");
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -68,25 +72,25 @@ public class HealthServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
 
             // get results
-            List<HealthCheckResponse> results = this.healthCheckRegistry.getResults();
+            List<HealthCheckResponse> results = healthCheckRegistry.getResults(getRequestType(request));
 
             // prepare response
             HealthResponse healthResponse = new HealthResponse();
             healthResponse.setChecks(results);
-            healthResponse.setOutcome(HealthCheckResponse.State.UP);
+            healthResponse.setStatus(HealthCheckResponse.State.UP);
 
             // check if any check is down
             for (HealthCheckResponse result : results) {
                 if (HealthCheckResponse.State.DOWN.equals(result.getState())) {
                     response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                    healthResponse.setOutcome(HealthCheckResponse.State.DOWN);
+                    healthResponse.setStatus(HealthCheckResponse.State.DOWN);
                     break;
                 }
             }
 
             // write results to response if servlet.response or debug is enabled
-            if (this.configurationUtil.getBoolean("kumuluzee.health.servlet.enabled").orElse(true) ||
-                    this.configurationUtil.getBoolean("kumuluzee.debug").orElse(false)) {
+            if (configurationUtil.getBoolean("kumuluzee.health.servlet.enabled").orElse(true) ||
+                    configurationUtil.getBoolean("kumuluzee.debug").orElse(false)) {
                 response.setContentType(MediaType.APPLICATION_JSON);
                 getWriter(request).writeValue(output, healthResponse);
             }
@@ -109,6 +113,21 @@ public class HealthServlet extends HttpServlet {
 
     private ObjectWriter getWriter(HttpServletRequest request) {
         boolean prettyPrintOff = "false".equals(request.getParameter("pretty"));
-        return prettyPrintOff ? this.mapper.writer() : this.mapper.writerWithDefaultPrettyPrinter();
+        return prettyPrintOff ? mapper.writer() : mapper.writerWithDefaultPrettyPrinter();
+    }
+
+    private HealthCheckType getRequestType(HttpServletRequest request) {
+
+        if (request.getRequestURI() == null) {
+            return HealthCheckType.BOTH;
+        }
+
+        if (request.getRequestURI().endsWith(servletMapping + "/live")) {
+            return HealthCheckType.LIVENESS;
+        } else if (request.getRequestURI().endsWith(servletMapping + "/ready")) {
+            return HealthCheckType.READINESS;
+        } else {
+            return HealthCheckType.BOTH;
+        }
     }
 }
