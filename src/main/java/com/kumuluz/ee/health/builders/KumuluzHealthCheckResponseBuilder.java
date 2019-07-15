@@ -21,6 +21,7 @@
 package com.kumuluz.ee.health.builders;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
@@ -98,6 +99,7 @@ public class KumuluzHealthCheckResponseBuilder extends HealthCheckResponseBuilde
             return name;
         }
 
+        @JsonProperty("status")
         @Override
         public HealthCheckResponse.State getState() {
             return state;

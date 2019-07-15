@@ -23,8 +23,11 @@ package com.kumuluz.ee.health.utils;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.health.HealthRegistry;
 import com.kumuluz.ee.health.checks.*;
+import com.kumuluz.ee.health.enums.HealthCheckType;
 import org.eclipse.microprofile.health.Health;
 import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.Liveness;
+import org.eclipse.microprofile.health.Readiness;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
@@ -35,6 +38,8 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.util.AnnotationLiteral;
 import java.sql.DriverManager;
 import java.util.Set;
+import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -47,80 +52,121 @@ public class HealthCheckInitializationExtension implements Extension {
 
     private static final Logger LOG = Logger.getLogger(HealthCheckInitializationExtension.class.getName());
 
-    public <T> void registerHealthChecks(@Observes @Initialized(ApplicationScoped.class) Object init, BeanManager
+    public void registerHealthChecks(@Observes @Initialized(ApplicationScoped.class) Object init, BeanManager
             beanManager) {
 
         // register classes that implement health checks
-        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-        HealthRegistry healthCheckRegistry = HealthRegistry.getInstance();
 
-        if (configurationUtil.get("kumuluzee.health.checks.data-source-health-check").isPresent()) {
+        registerHealthCheck("kumuluzee.health.checks.data-source-health-check",
+                DataSourceHealthCheck.class,
+                () -> {
+                    if(!DriverManager.getDrivers().hasMoreElements()){
+                        LOG.severe("No database driver library appears to be provided.");
+                        return false;
+                    }
 
-            if(!DriverManager.getDrivers().hasMoreElements()){
-                LOG.severe("No database driver library appears to be provided.");
-            }
+                    return true;
+                });
 
-            healthCheckRegistry.register(DataSourceHealthCheck.class.getSimpleName(), new DataSourceHealthCheck());
-        }
+        registerHealthCheck("kumuluzee.health.checks.disk-space-health-check",
+                DiskSpaceHealthCheck.class,
+                () -> true);
 
-        if (configurationUtil.get("kumuluzee.health.checks.disk-space-health-check").isPresent()) {
-            healthCheckRegistry.register(DiskSpaceHealthCheck.class.getSimpleName(), new DiskSpaceHealthCheck());
-        }
+        registerHealthCheck("kumuluzee.health.checks.elastic-search-health-check",
+                ElasticSearchHealthCheck.class,
+                () -> true);
 
-        if (configurationUtil.get("kumuluzee.health.checks.elastic-search-health-check").isPresent()) {
-            healthCheckRegistry.register(ElasticSearchHealthCheck.class.getSimpleName(), new ElasticSearchHealthCheck
-                    ());
-        }
+        registerHealthCheck("kumuluzee.health.checks.etcd-health-check",
+                EtcdHealthCheck.class,
+                () -> true);
 
-        if (configurationUtil.get("kumuluzee.health.checks.etcd-health-check").isPresent()) {
-            healthCheckRegistry.register(EtcdHealthCheck.class.getSimpleName(), new EtcdHealthCheck());
-        }
+        registerHealthCheck("kumuluzee.health.checks.http-health-check",
+                HttpHealthCheck.class,
+                () -> true);
 
-        if (configurationUtil.get("kumuluzee.health.checks.http-health-check").isPresent()) {
-            healthCheckRegistry.register(HttpHealthCheck.class.getSimpleName(), new HttpHealthCheck());
-        }
+        registerHealthCheck("kumuluzee.health.checks.mongo-health-check",
+                MongoHealthCheck.class,
+                () -> {
+                    try {
+                        Class.forName( "com.mongodb.MongoClient" );
+                        return true;
+                    } catch( ClassNotFoundException e ) {
+                        LOG.severe("The required mongo-java-driver library appears to be missing.");
+                        return false;
+                    }
+                });
 
-        if (configurationUtil.get("kumuluzee.health.checks.mongo-health-check").isPresent()) {
+        registerHealthCheck("kumuluzee.health.checks.rabbit-health-check",
+                RabbitHealthCheck.class,
+                () -> {
+                    try {
+                        Class.forName( "com.rabbitmq.client.Connection" );
+                        return true;
+                    } catch( ClassNotFoundException e ) {
+                        LOG.severe("The required amqp-client library appears to be missing.");
+                        return false;
+                    }
+                });
 
-            try {
-                Class.forName( "com.mongodb.MongoClient" );
-            } catch( ClassNotFoundException e ) {
-                LOG.severe("The required mongo-java-driver library appears to be missing.");
-            }
-
-            healthCheckRegistry.register(MongoHealthCheck.class.getSimpleName(), new MongoHealthCheck());
-        }
-
-        if (configurationUtil.get("kumuluzee.health.checks.rabbit-health-check").isPresent()) {
-
-            try {
-                Class.forName( "com.rabbitmq.client.Connection" );
-            } catch( ClassNotFoundException e ) {
-                LOG.severe("The required amqp-client library appears to be missing.");
-            }
-
-            healthCheckRegistry.register(RabbitHealthCheck.class.getSimpleName(), new RabbitHealthCheck());
-        }
-
-        if (configurationUtil.get("kumuluzee.health.checks.redis-health-check").isPresent()) {
-
-            try {
-                Class.forName( "redis.clients.jedis.JedisPool" );
-            } catch( ClassNotFoundException e ) {
-                LOG.severe("The required jedis library appears to be missing.");
-            }
-
-            healthCheckRegistry.register(RedisHealthCheck.class.getSimpleName(), new RedisHealthCheck());
-        }
+        registerHealthCheck("kumuluzee.health.checks.redis-health-check",
+                RedisHealthCheck.class,
+                () -> {
+                    try {
+                        Class.forName( "redis.clients.jedis.JedisPool" );
+                        return true;
+                    } catch( ClassNotFoundException e ) {
+                        LOG.severe("The required jedis library appears to be missing.");
+                        return false;
+                    }
+                });
 
         // register beans that implement health checks
-        Set<Bean<?>> beans = beanManager.getBeans(HealthCheck.class, new AnnotationLiteral<Health>() {
-        });
+        registerHealthCheckBeans(beanManager, new AnnotationLiteral<Liveness>() {}, HealthCheckType.LIVENESS);
+        registerHealthCheckBeans(beanManager, new AnnotationLiteral<Readiness>() {}, HealthCheckType.READINESS);
+        registerHealthCheckBeans(beanManager, new AnnotationLiteral<Health>() {}, HealthCheckType.BOTH);
+    }
 
-        for (Bean bean : beans) {
+    private void registerHealthCheckBeans(BeanManager beanManager, AnnotationLiteral qualifier, HealthCheckType type) {
+        // register beans that implement health checks
+        Set<Bean<?>> beans = beanManager.getBeans(HealthCheck.class, qualifier);
+
+        for (Bean<?> bean : beans) {
             HealthCheck healthCheckBean = (HealthCheck) beanManager.getReference(bean, HealthCheck.class,
                     beanManager.createCreationalContext(bean));
-            HealthRegistry.getInstance().register(bean.getBeanClass().getSimpleName(), healthCheckBean);
+            HealthRegistry.getInstance().register(bean.getBeanClass().getSimpleName(), healthCheckBean, type);
         }
+    }
+
+    private void registerHealthCheck(String configKeyPrefix, Class<? extends HealthCheck> healthCheckClass,
+                                     Supplier<Boolean> check) {
+        if (ConfigurationUtil.getInstance().get(configKeyPrefix).isPresent()) {
+
+            if (check.get()) {
+
+                try {
+                    HealthRegistry.getInstance().register(
+                            healthCheckClass.getSimpleName(),
+                            healthCheckClass.newInstance(),
+                            getHealthCheckType(configKeyPrefix));
+                } catch (InstantiationException | IllegalAccessException e) {
+                    LOG.log(Level.SEVERE, "Could not instantiate " + configKeyPrefix, e);
+                }
+
+            }
+        }
+    }
+
+    private HealthCheckType getHealthCheckType(String configKeyPrefix) {
+        String type = ConfigurationUtil.getInstance().get(configKeyPrefix + ".type").orElse("readiness");
+
+        HealthCheckType parsedType = HealthCheckType.parse(type);
+
+        if (parsedType == null) {
+            LOG.severe("Type of the health check " + configKeyPrefix + " is invalid (" + type + "). Using the " +
+                    "default type: readiness.");
+            parsedType = HealthCheckType.READINESS;
+        }
+
+        return parsedType;
     }
 }

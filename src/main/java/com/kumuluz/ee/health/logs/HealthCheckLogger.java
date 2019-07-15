@@ -23,6 +23,7 @@ package com.kumuluz.ee.health.logs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.kumuluz.ee.health.HealthRegistry;
+import com.kumuluz.ee.health.enums.HealthCheckType;
 import com.kumuluz.ee.health.models.HealthResponse;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
@@ -42,20 +43,27 @@ public class HealthCheckLogger implements Runnable {
     private static Level LEVEL;
 
     private ObjectMapper mapper;
+    private HealthCheckType type;
 
-    public HealthCheckLogger(String level) {
+    public HealthCheckLogger(String level, HealthCheckType type) {
         this.mapper = new ObjectMapper().registerModule(new Jdk8Module());
+
+        if (type == null) {
+            type = HealthCheckType.BOTH;
+        }
+
+        this.type = type;
         LEVEL = Level.parse(level.toUpperCase());
     }
 
     @Override
     public void run() {
         try {
-            List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults();
+            List<HealthCheckResponse> results = HealthRegistry.getInstance().getResults(type);
 
             HealthResponse healthResponse = new HealthResponse();
             healthResponse.setChecks(results);
-            healthResponse.setOutcome(
+            healthResponse.setStatus(
                     results.stream().anyMatch(result -> result.getState().equals(HealthCheckResponse.State.DOWN)) ?
                             HealthCheckResponse.State.DOWN : HealthCheckResponse.State.UP);
 

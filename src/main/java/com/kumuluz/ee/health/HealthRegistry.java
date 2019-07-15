@@ -20,6 +20,8 @@
 */
 package com.kumuluz.ee.health;
 
+import com.kumuluz.ee.health.enums.HealthCheckType;
+import com.kumuluz.ee.health.utils.HealthCheckWrapper;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
@@ -38,7 +40,7 @@ public class HealthRegistry {
 
     private static HealthRegistry instance;
 
-    private ConcurrentMap<String, HealthCheck> healthChecks;
+    private ConcurrentMap<String, HealthCheckWrapper> healthChecks;
 
     private HealthRegistry() {
         healthChecks = new ConcurrentHashMap<>();
@@ -64,8 +66,17 @@ public class HealthRegistry {
      * @param healthCheckName
      * @param healthCheck
      */
-    public void register(String healthCheckName, HealthCheck healthCheck) {
-        healthChecks.put(healthCheckName, healthCheck);
+    public void register(String healthCheckName, HealthCheck healthCheck, HealthCheckType type) {
+        HealthCheckWrapper wrapper = new HealthCheckWrapper(type, healthCheck);
+        healthChecks.compute(healthCheckName, (k, v) -> (v == null) ? wrapper : mergeWrappers(v, wrapper));
+    }
+
+    private HealthCheckWrapper mergeWrappers(HealthCheckWrapper existing, HealthCheckWrapper created) {
+        if (existing.getType().equals(created.getType())) {
+            return created;
+        }
+
+        return new HealthCheckWrapper(HealthCheckType.BOTH, created.getHealthCheck());
     }
 
     /**
@@ -82,9 +93,11 @@ public class HealthRegistry {
      *
      * @return list of health check results
      */
-    public List<HealthCheckResponse> getResults() {
-        return this.healthChecks.values().parallelStream().map(HealthCheck::call).collect(Collectors
-                .toList());
+    public List<HealthCheckResponse> getResults(HealthCheckType type) {
+        return this.healthChecks.values().parallelStream()
+                .filter(hcw -> type.equals(HealthCheckType.BOTH) || type.equals(hcw.getType()))
+                .map(hcw -> hcw.getHealthCheck().call())
+                .collect(Collectors.toList());
     }
 }
 
