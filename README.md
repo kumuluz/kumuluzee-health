@@ -11,7 +11,7 @@ been extensively tested to work in Kubernetes.
 
 KumuluzEE Health is compliant with the [MicroProfile Service Health Checks specification 2.0](https://github.com/eclipse/microprofile-health).
 
-KumuluzEE Health exposes a `/health/live` and `/health/ready` endpoints (prefix customizable), which return the health
+KumuluzEE Health exposes `/health/live` and `/health/ready` endpoints (prefix customizable), which return the health
 check status of the microservice.
 
 ## Usage
