@@ -21,11 +21,13 @@
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +37,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class RabbitHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class RabbitHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(RabbitHealthCheck.class.getName());
 
@@ -66,6 +70,22 @@ public class RabbitHealthCheck implements HealthCheck {
                             exception);
                 }
             }
+        }
+    }
+
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath+"rabbit-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        try {
+            Class.forName("com.rabbitmq.client.Connection");
+            return true;
+        } catch (ClassNotFoundException e) {
+            LOG.severe("The required amqp-client library appears to be missing.");
+            return false;
         }
     }
 }

@@ -17,14 +17,16 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import redis.clients.jedis.JedisPool;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +36,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class RedisHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class RedisHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(RedisHealthCheck.class.getName());
 
@@ -59,6 +63,22 @@ public class RedisHealthCheck implements HealthCheck {
             if (pool != null) {
                 pool.close();
             }
+        }
+    }
+
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "redis-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        try {
+            Class.forName("redis.clients.jedis.JedisPool");
+            return true;
+        } catch (ClassNotFoundException e) {
+            LOG.severe("The required jedis library appears to be missing.");
+            return false;
         }
     }
 }

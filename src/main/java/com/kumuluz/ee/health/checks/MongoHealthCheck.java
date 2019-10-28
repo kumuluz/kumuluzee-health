@@ -17,15 +17,17 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +37,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class MongoHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class MongoHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(MongoHealthCheck.class.getName());
 
@@ -89,5 +93,21 @@ public class MongoHealthCheck implements HealthCheck {
         }
 
         return false;
+    }
+
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "mongo-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        try {
+            Class.forName("com.mongodb.MongoClient");
+            return true;
+        } catch (ClassNotFoundException e) {
+            LOG.severe("The required mongo-java-driver library appears to be missing.");
+            return false;
+        }
     }
 }

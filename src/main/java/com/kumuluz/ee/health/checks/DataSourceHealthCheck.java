@@ -17,13 +17,15 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -37,7 +39,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class DataSourceHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(DataSourceHealthCheck.class.getName());
 
@@ -62,6 +66,21 @@ public class DataSourceHealthCheck implements HealthCheck {
                 }
             }
         }
+    }
+
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "data-source-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        if (!DriverManager.getDrivers().hasMoreElements()) {
+            LOG.severe("No database driver library appears to be provided.");
+            return false;
+        }
+
+        return true;
     }
 
     /**

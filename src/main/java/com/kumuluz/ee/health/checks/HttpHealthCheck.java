@@ -17,14 +17,16 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -38,7 +40,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class HttpHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class HttpHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(HttpHealthCheck.class.getName());
 
@@ -92,4 +96,13 @@ public class HttpHealthCheck implements HealthCheck {
         healthCheckResponseBuilder.down();
     }
 
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "http-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        return true;
+    }
 }
