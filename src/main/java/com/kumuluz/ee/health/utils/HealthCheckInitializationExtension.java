@@ -79,7 +79,7 @@ public class HealthCheckInitializationExtension implements Extension {
             }
             HealthCheck healthCheckBean = (HealthCheck) beanManager.getReference(bean, HealthCheck.class,
                     beanManager.createCreationalContext(bean));
-            HealthRegistry.getInstance().register(bean.getBeanClass().getSimpleName(), healthCheckBean, type);
+            HealthRegistry.getInstance().register(healthCheckBean.getClass().getSimpleName(), healthCheckBean, type);
         }
     }
 
