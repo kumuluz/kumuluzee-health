@@ -17,7 +17,7 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
@@ -49,7 +49,7 @@ public class RabbitHealthCheck extends KumuluzHealthCheck implements HealthCheck
     @Override
     public HealthCheckResponse call() {
         String connectionUrl = ConfigurationUtil.getInstance()
-                .get("kumuluzee.health.checks.rabbit-health-check.connection-url")
+                .get(name() + ".connection-url")
                 .orElse(DEFAULT_RABBIT_URL);
 
         Connection connection = null;
@@ -57,10 +57,10 @@ public class RabbitHealthCheck extends KumuluzHealthCheck implements HealthCheck
             ConnectionFactory factory = new ConnectionFactory();
             factory.setUri(connectionUrl);
             connection = factory.newConnection();
-            return HealthCheckResponse.named(RabbitHealthCheck.class.getSimpleName()).up().build();
+            return HealthCheckResponse.up(RabbitHealthCheck.class.getSimpleName());
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to RabbitMQ.", exception);
-            return HealthCheckResponse.named(RabbitHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(RabbitHealthCheck.class.getSimpleName());
         } finally {
             if (connection != null) {
                 try {
@@ -75,7 +75,7 @@ public class RabbitHealthCheck extends KumuluzHealthCheck implements HealthCheck
 
     @Override
     public String name() {
-        return kumuluzBaseHealthConfigPath+"rabbit-health-check";
+        return kumuluzBaseHealthConfigPath + "rabbit-health-check";
     }
 
     @Override

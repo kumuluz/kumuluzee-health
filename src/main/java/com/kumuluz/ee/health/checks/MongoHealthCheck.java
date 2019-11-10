@@ -49,7 +49,7 @@ public class MongoHealthCheck extends KumuluzHealthCheck implements HealthCheck 
     @Override
     public HealthCheckResponse call() {
         String connectionUrl = ConfigurationUtil.getInstance()
-                .get("kumuluzee.health.checks.mongo-health-check.connection-url")
+                .get(name() + ".connection-url")
                 .orElse(DEFAULT_MONGO_URL);
 
         MongoClient mongoClient = null;
@@ -59,14 +59,14 @@ public class MongoHealthCheck extends KumuluzHealthCheck implements HealthCheck 
             mongoClient = new MongoClient(mongoClientURI);
 
             if (databaseExist(mongoClient, mongoClientURI.getDatabase())) {
-                return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).up().build();
+                return HealthCheckResponse.up(MongoHealthCheck.class.getSimpleName());
             } else {
                 LOG.severe("Mongo database not found.");
-                return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).down().build();
+                return HealthCheckResponse.down(MongoHealthCheck.class.getSimpleName());
             }
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to Mongo.", exception);
-            return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(MongoHealthCheck.class.getSimpleName());
         } finally {
             if (mongoClient != null) {
                 mongoClient.close();

@@ -51,15 +51,16 @@ public class EtcdHealthCheck extends KumuluzHealthCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
         HealthCheckResponseBuilder healthCheckResponseBuilder = HealthCheckResponse.named(EtcdHealthCheck.class.getSimpleName()).up();
-        Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize("kumuluzee.health.checks.etcd-health-check");
+        Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize(name());
 
         if (connectionUrls.isPresent()) {
             for (int i = 0; i < connectionUrls.get(); i++) {
-                String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.etcd-health-check[" + i + "].connection-url").orElse("");
+                String connectionUrl =
+                        ConfigurationUtil.getInstance().get(name() + "[" + i + "].connection-url").orElse("");
                 checkEtcdStatus(connectionUrl, healthCheckResponseBuilder);
             }
         } else {
-            String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.etcd-health-check.connection-url").orElse("");
+            String connectionUrl = ConfigurationUtil.getInstance().get(name() + ".connection-url").orElse("");
             checkEtcdStatus(connectionUrl, healthCheckResponseBuilder);
         }
 

@@ -56,13 +56,14 @@ public class HealthCheckInitializationExtension implements Extension {
             beanManager) {
 
         // register beans that implement health checks
+        registerHealthCheckBeans(beanManager, new AnnotationLiteral<BuiltInHealthCheck>() {
+        }, HealthCheckType.READINESS);
         registerHealthCheckBeans(beanManager, new AnnotationLiteral<Liveness>() {
         }, HealthCheckType.LIVENESS);
         registerHealthCheckBeans(beanManager, new AnnotationLiteral<Readiness>() {
         }, HealthCheckType.READINESS);
+        //backwards compatible TBR
         registerHealthCheckBeans(beanManager, new AnnotationLiteral<Health>() {
-        }, HealthCheckType.BOTH);
-        registerHealthCheckBeans(beanManager, new AnnotationLiteral<BuiltInHealthCheck>() {
         }, HealthCheckType.BOTH);
     }
 
@@ -72,18 +73,24 @@ public class HealthCheckInitializationExtension implements Extension {
 
         boolean disableDefaultHealthChecks = ConfigurationUtil.getInstance().getBoolean(MP_HEALTH_DISABLE_DEFAULT_HEALTH).orElse(false);
         for (Bean<?> bean : beans) {
+            HealthCheckType hcType = type;
             if (bean.getBeanClass().isAnnotationPresent(BuiltInHealthCheck.class)) {
-                if (disableDefaultHealthChecks || !isBuildInHealthCheckValidForRegistration(bean)) {
+                if (disableDefaultHealthChecks) {
                     continue;
                 }
+                KumuluzHealthCheck kumuluzHealthCheckBean = getBuildInHealthCheckBeanInstance(bean);
+                if (kumuluzHealthCheckBean == null) {
+                    continue;
+                }
+                hcType = kumuluzHealthCheckBean.getHealthCheckType();
             }
             HealthCheck healthCheckBean = (HealthCheck) beanManager.getReference(bean, HealthCheck.class,
                     beanManager.createCreationalContext(bean));
-            HealthRegistry.getInstance().register(healthCheckBean.getClass().getSimpleName(), healthCheckBean, type);
+            HealthRegistry.getInstance().register(healthCheckBean.getClass().getSimpleName(), healthCheckBean, hcType);
         }
     }
 
-    private boolean isBuildInHealthCheckValidForRegistration(Bean<?> bean) {
+    private KumuluzHealthCheck getBuildInHealthCheckBeanInstance(Bean<?> bean) {
         if (KumuluzHealthCheck.class.isAssignableFrom(bean.getBeanClass())) {
             try {
                 KumuluzHealthCheck instance = (KumuluzHealthCheck) bean.getBeanClass().newInstance();
@@ -91,27 +98,13 @@ public class HealthCheckInitializationExtension implements Extension {
 
                 if (ConfigurationUtil.getInstance().get(kumuluzHealthCheckName).isPresent()) {
                     if (instance.initSuccess()) {
-                        return true;
+                        return instance;
                     }
                 }
             } catch (Exception e) {
 
             }
         }
-        return false;
-    }
-
-    private HealthCheckType getHealthCheckType(String configKeyPrefix) {
-        String type = ConfigurationUtil.getInstance().get(configKeyPrefix + ".type").orElse("readiness");
-
-        HealthCheckType parsedType = HealthCheckType.parse(type);
-
-        if (parsedType == null) {
-            LOG.severe("Type of the health check " + configKeyPrefix + " is invalid (" + type + "). Using the " +
-                    "default type: readiness.");
-            parsedType = HealthCheckType.READINESS;
-        }
-
-        return parsedType;
+        return null;
     }
 }

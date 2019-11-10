@@ -49,19 +49,19 @@ public class DiskSpaceHealthCheck extends KumuluzHealthCheck implements HealthCh
     @Override
     public HealthCheckResponse call() {
         long threshold = ConfigurationUtil.getInstance()
-                .getLong("kumuluzee.health.checks.disk-space-health-check.threshold")
+                .getLong(name() + ".threshold")
                 .orElse(DEFAULT_THRESHOLD);
 
         try {
             if (Files.getFileStore(Paths.get("/")).getUsableSpace() >= threshold) {
-                return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).up().build();
+                return HealthCheckResponse.up(DiskSpaceHealthCheck.class.getSimpleName());
             } else {
                 LOG.severe("Disk space is getting low.");
-                return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).down().build();
+                return HealthCheckResponse.down(DiskSpaceHealthCheck.class.getSimpleName());
             }
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to read disk space.", exception);
-            return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(DiskSpaceHealthCheck.class.getSimpleName());
         }
     }
 

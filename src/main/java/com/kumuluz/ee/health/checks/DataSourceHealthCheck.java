@@ -51,11 +51,11 @@ public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthC
 
         try {
             connection = getConnection();
-            return HealthCheckResponse.named(DataSourceHealthCheck.class.getSimpleName()).up().build();
+            return HealthCheckResponse.up(DataSourceHealthCheck.class.getSimpleName());
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to data source.",
                     exception);
-            return HealthCheckResponse.named(DataSourceHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(DataSourceHealthCheck.class.getSimpleName());
         } finally {
             if (connection != null) {
                 try {
@@ -92,7 +92,7 @@ public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthC
     private Connection getConnection() throws SQLException {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-        Optional<String> jndiName = configurationUtil.get("kumuluzee.health.checks.data-source-health-check.jndi-name");
+        Optional<String> jndiName = configurationUtil.get(name() + ".jndi-name");
         Optional<Integer> dsSizeOpt = configurationUtil.getListSize("kumuluzee.datasources");
 
         String connectionUrl = null;
@@ -112,12 +112,9 @@ public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthC
                 }
             }
         } else {
-            connectionUrl = configurationUtil.get("kumuluzee.health.checks.data-source-health-check" +
-                    ".connection-url").orElse(null);
-            username = configurationUtil.get("kumuluzee.health.checks.data-source-health-check.username")
-                    .orElse(null);
-            password = configurationUtil.get("kumuluzee.health.checks.data-source-health-check.password")
-                    .orElse(null);
+            connectionUrl = configurationUtil.get(name() + ".connection-url").orElse(null);
+            username = configurationUtil.get(name() + ".username").orElse(null);
+            password = configurationUtil.get(name() + ".password").orElse(null);
         }
 
         return username != null && password != null ? DriverManager.getConnection(connectionUrl, username, password) :

@@ -47,18 +47,17 @@ public class RedisHealthCheck extends KumuluzHealthCheck implements HealthCheck 
 
     @Override
     public HealthCheckResponse call() {
-        String connectionUrl = ConfigurationUtil.getInstance()
-                .get("kumuluzee.health.checks.redis-health-check.connection-url")
+        String connectionUrl = ConfigurationUtil.getInstance().get(name() + ".connection-url")
                 .orElse(DEFAULT_REDIS_URL);
 
         JedisPool pool = null;
         try {
             pool = new JedisPool(connectionUrl);
             pool.getResource();
-            return HealthCheckResponse.named(RedisHealthCheck.class.getSimpleName()).up().build();
+            return HealthCheckResponse.up(RedisHealthCheck.class.getSimpleName());
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to Redis.", exception);
-            return HealthCheckResponse.named(RedisHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(RedisHealthCheck.class.getSimpleName());
         } finally {
             if (pool != null) {
                 pool.close();

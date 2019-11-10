@@ -84,7 +84,7 @@ import javax.enterprise.context.ApplicationScoped;
 public class SuccessfulHealthCheckBean implements HealthCheck {
 
     public HealthCheckResponse call() {
-        return HealthCheckResponse.named(SuccessfulHealthCheckBean.class.getSimpleName()).up().build();
+        return HealthCheckResponse.up(SuccessfulHealthCheckBean.class.getSimpleName());
     }
 
 }
@@ -120,12 +120,12 @@ public class GithubHealthCheck implements HealthCheck {
             connection.setRequestMethod("HEAD");
 
             if (connection.getResponseCode() == 200) {
-                return HealthCheckResponse.named(GithubHealthCheck.class.getSimpleName()).up().build();
+                return HealthCheckResponse.up(GithubHealthCheck.class.getSimpleName());
             }
         } catch (Exception exception) {
             LOG.severe(exception.getMessage());
         }
-        return HealthCheckResponse.named(GithubHealthCheck.class.getSimpleName()).down().build();
+        return HealthCheckResponse.down(GithubHealthCheck.class.getSimpleName());
     }
 }
 ```

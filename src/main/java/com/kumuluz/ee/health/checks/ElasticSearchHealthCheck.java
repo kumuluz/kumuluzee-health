@@ -59,7 +59,7 @@ public class ElasticSearchHealthCheck extends KumuluzHealthCheck implements Heal
     @Override
     public HealthCheckResponse call() {
         String connectionUrl = ConfigurationUtil.getInstance()
-                .get("kumuluzee.health.checks.elastic-search-health-check.connection-url")
+                .get(name() + ".connection-url")
                 .orElse(DEFAULT_CLUSTER_HEALTH_URL);
 
         WebTarget webTarget = CLIENT.target(connectionUrl);
@@ -73,15 +73,15 @@ public class ElasticSearchHealthCheck extends KumuluzHealthCheck implements Heal
                 Object status = result.get(STATUS);
 
                 if (status != null && (GREEN.equals(status.toString()) || YELLOW.equals(status.toString()))) {
-                    return HealthCheckResponse.named(ElasticSearchHealthCheck.class.getSimpleName()).up().build();
+                    return HealthCheckResponse.up(ElasticSearchHealthCheck.class.getSimpleName());
                 }
             }
 
-            return HealthCheckResponse.named(ElasticSearchHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(ElasticSearchHealthCheck.class.getSimpleName());
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to get Elasticsearch cluster status.",
                     exception);
-            return HealthCheckResponse.named(ElasticSearchHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(ElasticSearchHealthCheck.class.getSimpleName());
         } finally {
             if (response != null) {
                 response.close();

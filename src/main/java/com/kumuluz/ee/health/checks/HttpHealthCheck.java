@@ -50,18 +50,15 @@ public class HttpHealthCheck extends KumuluzHealthCheck implements HealthCheck {
     public HealthCheckResponse call() {
         HealthCheckResponseBuilder healthCheckResponseBuilder = HealthCheckResponse.named(HttpHealthCheck.class
                 .getSimpleName()).up();
-        Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize("kumuluzee.health.checks" +
-                ".http-health-check");
+        Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize(name());
 
         if (connectionUrls.isPresent()) {
             for (int i = 0; i < connectionUrls.get(); i++) {
-                String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks" +
-                        ".http-health-check[" + i + "].connection-url").orElse("");
+                String connectionUrl = ConfigurationUtil.getInstance().get(name() + "[" + i + "].connection-url").orElse("");
                 checkHttpStatus(connectionUrl, healthCheckResponseBuilder);
             }
         } else {
-            String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.http-health-check" +
-                    ".connection-url").orElse("");
+            String connectionUrl = ConfigurationUtil.getInstance().get(name() + ".connection-url").orElse("");
             checkHttpStatus(connectionUrl, healthCheckResponseBuilder);
         }
 
