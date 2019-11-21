@@ -17,13 +17,15 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -37,7 +39,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class DataSourceHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(DataSourceHealthCheck.class.getName());
 
@@ -47,11 +51,11 @@ public class DataSourceHealthCheck implements HealthCheck {
 
         try {
             connection = getConnection();
-            return HealthCheckResponse.named(DataSourceHealthCheck.class.getSimpleName()).up().build();
+            return HealthCheckResponse.up(DataSourceHealthCheck.class.getSimpleName());
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to data source.",
                     exception);
-            return HealthCheckResponse.named(DataSourceHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(DataSourceHealthCheck.class.getSimpleName());
         } finally {
             if (connection != null) {
                 try {
@@ -64,6 +68,21 @@ public class DataSourceHealthCheck implements HealthCheck {
         }
     }
 
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "data-source-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        if (!DriverManager.getDrivers().hasMoreElements()) {
+            LOG.severe("No database driver library appears to be provided.");
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Helper method for retrieving connection.
      *
@@ -73,7 +92,7 @@ public class DataSourceHealthCheck implements HealthCheck {
     private Connection getConnection() throws SQLException {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-        Optional<String> jndiName = configurationUtil.get("kumuluzee.health.checks.data-source-health-check.jndi-name");
+        Optional<String> jndiName = configurationUtil.get(name() + ".jndi-name");
         Optional<Integer> dsSizeOpt = configurationUtil.getListSize("kumuluzee.datasources");
 
         String connectionUrl = null;
@@ -93,12 +112,9 @@ public class DataSourceHealthCheck implements HealthCheck {
                 }
             }
         } else {
-            connectionUrl = configurationUtil.get("kumuluzee.health.checks.data-source-health-check" +
-                    ".connection-url").orElse(null);
-            username = configurationUtil.get("kumuluzee.health.checks.data-source-health-check.username")
-                    .orElse(null);
-            password = configurationUtil.get("kumuluzee.health.checks.data-source-health-check.password")
-                    .orElse(null);
+            connectionUrl = configurationUtil.get(name() + ".connection-url").orElse(null);
+            username = configurationUtil.get(name() + ".username").orElse(null);
+            password = configurationUtil.get(name() + ".password").orElse(null);
         }
 
         return username != null && password != null ? DriverManager.getConnection(connectionUrl, username, password) :

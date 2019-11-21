@@ -17,15 +17,17 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +37,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class MongoHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class MongoHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(MongoHealthCheck.class.getName());
 
@@ -45,7 +49,7 @@ public class MongoHealthCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
         String connectionUrl = ConfigurationUtil.getInstance()
-                .get("kumuluzee.health.checks.mongo-health-check.connection-url")
+                .get(name() + ".connection-url")
                 .orElse(DEFAULT_MONGO_URL);
 
         MongoClient mongoClient = null;
@@ -55,14 +59,14 @@ public class MongoHealthCheck implements HealthCheck {
             mongoClient = new MongoClient(mongoClientURI);
 
             if (databaseExist(mongoClient, mongoClientURI.getDatabase())) {
-                return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).up().build();
+                return HealthCheckResponse.up(MongoHealthCheck.class.getSimpleName());
             } else {
                 LOG.severe("Mongo database not found.");
-                return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).down().build();
+                return HealthCheckResponse.down(MongoHealthCheck.class.getSimpleName());
             }
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to Mongo.", exception);
-            return HealthCheckResponse.named(MongoHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(MongoHealthCheck.class.getSimpleName());
         } finally {
             if (mongoClient != null) {
                 mongoClient.close();
@@ -89,5 +93,21 @@ public class MongoHealthCheck implements HealthCheck {
         }
 
         return false;
+    }
+
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "mongo-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        try {
+            Class.forName("com.mongodb.MongoClient");
+            return true;
+        } catch (ClassNotFoundException e) {
+            LOG.severe("The required mongo-java-driver library appears to be missing.");
+            return false;
+        }
     }
 }

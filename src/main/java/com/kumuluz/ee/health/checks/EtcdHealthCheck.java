@@ -21,10 +21,12 @@
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -38,7 +40,9 @@ import java.util.logging.Logger;
  * @author Benjamin Kastelic
  * @since 1.0.0
  */
-public class EtcdHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class EtcdHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(EtcdHealthCheck.class.getName());
 
@@ -47,15 +51,16 @@ public class EtcdHealthCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
         HealthCheckResponseBuilder healthCheckResponseBuilder = HealthCheckResponse.named(EtcdHealthCheck.class.getSimpleName()).up();
-        Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize("kumuluzee.health.checks.etcd-health-check");
+        Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize(name());
 
         if (connectionUrls.isPresent()) {
             for (int i = 0; i < connectionUrls.get(); i++) {
-                String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.etcd-health-check[" + i + "].connection-url").orElse("");
+                String connectionUrl =
+                        ConfigurationUtil.getInstance().get(name() + "[" + i + "].connection-url").orElse("");
                 checkEtcdStatus(connectionUrl, healthCheckResponseBuilder);
             }
         } else {
-            String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.etcd-health-check.connection-url").orElse("");
+            String connectionUrl = ConfigurationUtil.getInstance().get(name() + ".connection-url").orElse("");
             checkEtcdStatus(connectionUrl, healthCheckResponseBuilder);
         }
 
@@ -90,5 +95,15 @@ public class EtcdHealthCheck implements HealthCheck {
 
         healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.State.DOWN.toString());
         healthCheckResponseBuilder.down();
+    }
+
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "etcd-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        return true;
     }
 }

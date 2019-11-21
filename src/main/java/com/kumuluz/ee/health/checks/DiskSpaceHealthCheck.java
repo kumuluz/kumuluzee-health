@@ -17,13 +17,15 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Level;
@@ -35,7 +37,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class DiskSpaceHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class DiskSpaceHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(DiskSpaceHealthCheck.class.getName());
 
@@ -45,19 +49,29 @@ public class DiskSpaceHealthCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
         long threshold = ConfigurationUtil.getInstance()
-                .getLong("kumuluzee.health.checks.disk-space-health-check.threshold")
+                .getLong(name() + ".threshold")
                 .orElse(DEFAULT_THRESHOLD);
 
         try {
             if (Files.getFileStore(Paths.get("/")).getUsableSpace() >= threshold) {
-                return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).up().build();
+                return HealthCheckResponse.up(DiskSpaceHealthCheck.class.getSimpleName());
             } else {
                 LOG.severe("Disk space is getting low.");
-                return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).down().build();
+                return HealthCheckResponse.down(DiskSpaceHealthCheck.class.getSimpleName());
             }
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to read disk space.", exception);
-            return HealthCheckResponse.named(DiskSpaceHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(DiskSpaceHealthCheck.class.getSimpleName());
         }
+    }
+
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "disk-space-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        return true;
     }
 }

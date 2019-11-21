@@ -17,14 +17,16 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
@@ -38,7 +40,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class HttpHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class HttpHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(HttpHealthCheck.class.getName());
 
@@ -46,18 +50,15 @@ public class HttpHealthCheck implements HealthCheck {
     public HealthCheckResponse call() {
         HealthCheckResponseBuilder healthCheckResponseBuilder = HealthCheckResponse.named(HttpHealthCheck.class
                 .getSimpleName()).up();
-        Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize("kumuluzee.health.checks" +
-                ".http-health-check");
+        Optional<Integer> connectionUrls = ConfigurationUtil.getInstance().getListSize(name());
 
         if (connectionUrls.isPresent()) {
             for (int i = 0; i < connectionUrls.get(); i++) {
-                String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks" +
-                        ".http-health-check[" + i + "].connection-url").orElse("");
+                String connectionUrl = ConfigurationUtil.getInstance().get(name() + "[" + i + "].connection-url").orElse("");
                 checkHttpStatus(connectionUrl, healthCheckResponseBuilder);
             }
         } else {
-            String connectionUrl = ConfigurationUtil.getInstance().get("kumuluzee.health.checks.http-health-check" +
-                    ".connection-url").orElse("");
+            String connectionUrl = ConfigurationUtil.getInstance().get(name() + ".connection-url").orElse("");
             checkHttpStatus(connectionUrl, healthCheckResponseBuilder);
         }
 
@@ -92,4 +93,13 @@ public class HttpHealthCheck implements HealthCheck {
         healthCheckResponseBuilder.down();
     }
 
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "http-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        return true;
+    }
 }

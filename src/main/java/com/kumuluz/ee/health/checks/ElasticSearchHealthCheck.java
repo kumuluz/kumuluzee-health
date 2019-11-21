@@ -17,13 +17,15 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health.checks;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -40,7 +42,9 @@ import java.util.logging.Logger;
  * @author Marko Škrjanec
  * @since 1.0.0
  */
-public class ElasticSearchHealthCheck implements HealthCheck {
+@ApplicationScoped
+@BuiltInHealthCheck
+public class ElasticSearchHealthCheck extends KumuluzHealthCheck implements HealthCheck {
 
     private static final Logger LOG = Logger.getLogger(ElasticSearchHealthCheck.class.getName());
     private static final Client CLIENT = ClientBuilder.newClient();
@@ -55,7 +59,7 @@ public class ElasticSearchHealthCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
         String connectionUrl = ConfigurationUtil.getInstance()
-                .get("kumuluzee.health.checks.elastic-search-health-check.connection-url")
+                .get(name() + ".connection-url")
                 .orElse(DEFAULT_CLUSTER_HEALTH_URL);
 
         WebTarget webTarget = CLIENT.target(connectionUrl);
@@ -69,19 +73,29 @@ public class ElasticSearchHealthCheck implements HealthCheck {
                 Object status = result.get(STATUS);
 
                 if (status != null && (GREEN.equals(status.toString()) || YELLOW.equals(status.toString()))) {
-                    return HealthCheckResponse.named(ElasticSearchHealthCheck.class.getSimpleName()).up().build();
+                    return HealthCheckResponse.up(ElasticSearchHealthCheck.class.getSimpleName());
                 }
             }
 
-            return HealthCheckResponse.named(ElasticSearchHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(ElasticSearchHealthCheck.class.getSimpleName());
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, "An exception occurred when trying to get Elasticsearch cluster status.",
                     exception);
-            return HealthCheckResponse.named(ElasticSearchHealthCheck.class.getSimpleName()).down().build();
+            return HealthCheckResponse.down(ElasticSearchHealthCheck.class.getSimpleName());
         } finally {
             if (response != null) {
                 response.close();
             }
         }
+    }
+
+    @Override
+    public String name() {
+        return kumuluzBaseHealthConfigPath + "elastic-search-health-check";
+    }
+
+    @Override
+    public boolean initSuccess() {
+        return true;
     }
 }
