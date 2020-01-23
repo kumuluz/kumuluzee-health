@@ -17,7 +17,7 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 package com.kumuluz.ee.health;
 
 import com.kumuluz.ee.health.enums.HealthCheckType;
@@ -95,7 +95,7 @@ public class HealthRegistry {
      */
     public List<HealthCheckResponse> getResults(HealthCheckType type) {
         return this.healthChecks.values().parallelStream()
-                .filter(hcw -> type.equals(HealthCheckType.BOTH) || type.equals(hcw.getType()))
+                .filter(hcw -> type.equals(HealthCheckType.BOTH) || type.equals(hcw.getType()) || (hcw.getType() == HealthCheckType.BOTH && (type == HealthCheckType.READINESS || type == HealthCheckType.LIVENESS)))
                 .map(hcw -> hcw.getHealthCheck().call())
                 .collect(Collectors.toList());
     }

@@ -1,0 +1,10 @@
+kumuluzee:
+  datasources:
+    - jndi-name: jdbc/ds
+      connection-url: jdbc:h2:~/test
+
+  health:
+    checks:
+      data-source-health-check:
+        type: both
+        jndi-name: jdbc/ds
