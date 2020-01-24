@@ -64,7 +64,7 @@ public class HealthCheckInitializationExtension implements Extension {
         }, HealthCheckType.READINESS);
         //backwards compatible TBR
         registerHealthCheckBeans(beanManager, new AnnotationLiteral<Health>() {
-        }, HealthCheckType.BOTH);
+        }, null);
     }
 
     private void registerHealthCheckBeans(BeanManager beanManager, AnnotationLiteral qualifier, HealthCheckType type) {
