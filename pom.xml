@@ -24,9 +24,9 @@
 
         <jaxb-api.version>2.3.1</jaxb-api.version>
 
-        <kumuluzee.version>3.5.0</kumuluzee.version>
+        <kumuluzee.version>3.7.0</kumuluzee.version>
 
-        <microprofile-health.version>2.1</microprofile-health.version>
+        <microprofile-health.version>2.2</microprofile-health.version>
 
         <jackson.version>2.9.9</jackson.version>
         <jedis.version>3.0.1</jedis.version>
