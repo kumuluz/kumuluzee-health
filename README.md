@@ -55,6 +55,7 @@ The following health checks are available out-of-the-box:
 - **MongoHealthCheck** for checking the availability of Mongo database
 - **RabbitHealthCheck** for checking the availability of RabbitMQ virtual host
 - **RedisHealthCheck** for checking the availability of Redis store
+- **KafkaHealthCheck** for checking the availability of Kafka cluster
 
 More detailed descriptions of each health check are provided below. Additional built-in health check will be provided
 (contributions are welcome).
@@ -511,6 +512,38 @@ Example configuration:
 	<groupId>redis.clients</groupId>
 	<artifactId>jedis</artifactId>
 	<version>3.0.1</version>
+</dependency>
+```
+
+### KafkaHealthCheck
+
+To enable Kafka cluster health check provide the `bootstrap-servers` urls as a comma separated list. The default value
+is `localhost:9092`.
+
+Additionally, you can supply the `request-timeout-ms` value (default is `5000`) and the `minimum-available-nodes` value
+(default is `1`). The latter represents the minimum number of available nodes in the cluster in order for the health
+check to be considered successful.
+
+Example of the configuration:
+
+```yml
+kumuluzee:
+  health:
+    checks:
+      kafka-health-check:
+        bootstrap-servers: localhost:9095,localhost:9096,localhost:9097
+        minimum-available-nodes: 2
+        request-timeout-ms: 1000
+```
+
+The following dependency needs to be provided in order for the health check to function correctly
+(when using `kumuluzee-streaming` library the dependency is already provided):
+
+```xml
+<dependency>
+    <groupId>org.apache.kafka</groupId>
+    <artifactId>kafka-clients</artifactId>
+    <version>2.6.0</version>
 </dependency>
 ```
 
