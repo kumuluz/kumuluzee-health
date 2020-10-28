@@ -26,6 +26,8 @@
 
         <kumuluzee.version>3.8.0</kumuluzee.version>
 
+        <kumuluzee-openapi-mp.version>1.3.0-SNAPSHOT</kumuluzee-openapi-mp.version>
+
         <microprofile-health.version>2.2</microprofile-health.version>
 
         <jackson.version>2.9.9</jackson.version>
@@ -137,6 +139,14 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>${kafka-clients.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- OpenAPI MP integration -->
+        <dependency>
+            <groupId>com.kumuluz.ee.openapi</groupId>
+            <artifactId>kumuluzee-openapi-mp</artifactId>
+            <version>${kumuluzee-openapi-mp.version}</version>
             <optional>true</optional>
         </dependency>
 
