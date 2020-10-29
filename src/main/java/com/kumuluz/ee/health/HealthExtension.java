@@ -29,6 +29,7 @@ import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.health.enums.HealthCheckType;
 import com.kumuluz.ee.health.logs.HealthCheckLogger;
+import com.kumuluz.ee.health.utils.HealthServletMappingUtil;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -74,16 +75,7 @@ public class HealthExtension implements Extension {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
         // initialize servlet mapping
-        String servletMapping = configurationUtil.get("kumuluzee.health.servlet.mapping").orElse("/health/*");
-
-        if (!servletMapping.endsWith("/*")) {
-            if (servletMapping.endsWith("/")) {
-                servletMapping += "*";
-            } else {
-                servletMapping += "/*";
-            }
-        }
-
+        String servletMapping = HealthServletMappingUtil.getMapping();
         LOG.info("Registering health servlet on " + servletMapping);
 
         // register servlet
