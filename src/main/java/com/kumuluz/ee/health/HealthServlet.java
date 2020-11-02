@@ -20,6 +20,7 @@
  */
 package com.kumuluz.ee.health;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,7 +61,13 @@ public class HealthServlet extends HttpServlet {
     public void init() throws ServletException {
         configurationUtil = ConfigurationUtil.getInstance();
         healthCheckRegistry = HealthRegistry.getInstance();
+
         mapper = new ObjectMapper().registerModule(new Jdk8Module());
+
+        if (!configurationUtil.getBoolean("kumuluzee.health.servlet.serializeNulls").orElse(true)) {
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        }
+
         servletMapping = getInitParameter("com.kumuluz.ee.health.servletMapping");
     }
 
