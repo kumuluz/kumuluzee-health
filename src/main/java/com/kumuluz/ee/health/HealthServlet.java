@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,10 +62,7 @@ public class HealthServlet extends HttpServlet {
         healthCheckRegistry = HealthRegistry.getInstance();
 
         mapper = new ObjectMapper().registerModule(new Jdk8Module());
-
-        if (!configurationUtil.getBoolean("kumuluzee.health.servlet.serializeNulls").orElse(true)) {
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        }
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         servletMapping = getInitParameter("com.kumuluz.ee.health.servletMapping");
     }
