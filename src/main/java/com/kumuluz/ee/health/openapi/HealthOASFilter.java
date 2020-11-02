@@ -115,7 +115,7 @@ public class HealthOASFilter implements OASFilter {
         Map<String, Schema> schemas = new HashMap<>(openAPI.getComponents().getSchemas());
         schemas.put("HealthStatus", healthStatusSchema);
         schemas.put("HealthResponse", healthResponseSchema);
-        
+
         openAPI.getComponents().setSchemas(schemas);
 
         PathItem healthPath = createHealthPath("Get information about the health of this service",
