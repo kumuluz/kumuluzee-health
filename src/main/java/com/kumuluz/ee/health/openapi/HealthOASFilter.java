@@ -88,7 +88,6 @@ public class HealthOASFilter implements OASFilter {
         healthStatusSchema.setType(Schema.SchemaType.STRING);
         healthStatusSchema.setEnumeration(Arrays.asList(new String[]{"UP", "DOWN"}));
         healthStatusSchema.setExample("UP/DOWN"); // looks better in examples
-        openAPI.getComponents().getSchemas().put("HealthStatus", healthStatusSchema);
 
         Schema healthCheckSchema = new SchemaImpl();
         healthCheckSchema.setType(Schema.SchemaType.OBJECT);
@@ -103,7 +102,6 @@ public class HealthOASFilter implements OASFilter {
                 .nullable(true));
         healthCheckSchema.setProperties(healthCheckSchemaProperties);
 
-
         Schema healthResponseSchema = new SchemaImpl();
         healthResponseSchema.setType(Schema.SchemaType.OBJECT);
         Map<String, Schema> healthResponseSchemaProperties = new HashMap<>();
@@ -113,17 +111,26 @@ public class HealthOASFilter implements OASFilter {
                 .type(Schema.SchemaType.ARRAY)
                 .items(healthCheckSchema));
         healthResponseSchema.setProperties(healthResponseSchemaProperties);
-        openAPI.getComponents().getSchemas().put("HealthResponse", healthResponseSchema);
+
+        Map<String, Schema> schemas = new HashMap<>(openAPI.getComponents().getSchemas());
+        schemas.put("HealthStatus", healthStatusSchema);
+        schemas.put("HealthResponse", healthResponseSchema);
+        
+        openAPI.getComponents().setSchemas(schemas);
 
         PathItem healthPath = createHealthPath("Get information about the health of this service",
                 "Contains both readiness and liveness checks.");
-        openAPI.getPaths().addPathItem(this.servletMapping, healthPath);
         PathItem healthReadyPath = createHealthPath("Get information about the readiness of this service",
                 null);
-        openAPI.getPaths().addPathItem(this.servletMapping + "/ready", healthReadyPath);
         PathItem healthLivePath = createHealthPath("Get information about the liveness of this service",
                 null);
-        openAPI.getPaths().addPathItem(this.servletMapping + "/live", healthLivePath);
+
+        Map<String, PathItem> pathItems = new HashMap<>(openAPI.getPaths().getPathItems());
+        pathItems.put(this.servletMapping, healthPath);
+        pathItems.put(this.servletMapping + "/ready", healthReadyPath);
+        pathItems.put(this.servletMapping + "/live", healthLivePath);
+
+        openAPI.getPaths().setPathItems(pathItems);
     }
 
     private PathItem createHealthPath(String summary, String description) {
