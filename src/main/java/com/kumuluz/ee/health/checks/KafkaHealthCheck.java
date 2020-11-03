@@ -31,7 +31,8 @@ import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.Collection;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,19 +59,16 @@ public class KafkaHealthCheck extends KumuluzHealthCheck implements HealthCheck 
 
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-        String bootstrapServers = configurationUtil.get(name() + ".bootstrap-servers")
-                .orElse(DEFAULT_KAFKA_BOOTSTRAP_SERVERS);
-        int requestTimeout = configurationUtil.getInteger(name() + ".request-timeout-ms")
-                .orElse(DEFAULT_KAFKA_REQUEST_TIMEOUT_MS);
+        Map<String, Object> configuration = getHealthCheckConfiguration(name());
+
+        configuration.putIfAbsent("bootstrap.servers", DEFAULT_KAFKA_BOOTSTRAP_SERVERS);
+        configuration.putIfAbsent("request.timeout.ms", DEFAULT_KAFKA_REQUEST_TIMEOUT_MS);
+        configuration.putIfAbsent("connections.max.idle.ms", (long) configuration.get("request.timeout.ms") * 3);
+
         int minimumAvailableNodes = configurationUtil.getInteger(name() + ".minimum-available-nodes")
                 .orElse(DEFAULT_KAFKA_MIN_AVAILABLE_NODES);
 
-        Properties kafkaProperties = new Properties();
-        kafkaProperties.put("bootstrap.servers", bootstrapServers);
-        kafkaProperties.put("request.timeout.ms", requestTimeout);
-        kafkaProperties.put("connections.max.idle.ms", requestTimeout * 3);
-
-        try (AdminClient adminClient = KafkaAdminClient.create(kafkaProperties)) {
+        try (AdminClient adminClient = KafkaAdminClient.create(configuration)) {
 
             // timeout on get serves only as fallback, the timeout in properties gives more descriptive exceptions
             Collection<Node> nodes = adminClient.describeCluster().nodes()
@@ -104,5 +102,22 @@ public class KafkaHealthCheck extends KumuluzHealthCheck implements HealthCheck 
             LOG.severe("The required kafka-clients library appears to be missing or outdated.");
             return false;
         }
+    }
+
+    private Map<String, Object> getHealthCheckConfiguration(String configurationKey) {
+        Map<String, Object> configuration = new HashMap<>();
+
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+
+        configurationUtil.getMapKeys(configurationKey).ifPresent(keys -> {
+            keys.forEach(key -> {
+                configurationUtil.get(key).ifPresent(value -> {
+                    String newKey = key.replaceAll("-", ".");
+                    configuration.put(newKey, value);
+                });
+            });
+        });
+
+        return configuration;
     }
 }
