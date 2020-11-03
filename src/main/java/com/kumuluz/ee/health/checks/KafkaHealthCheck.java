@@ -63,7 +63,7 @@ public class KafkaHealthCheck extends KumuluzHealthCheck implements HealthCheck 
 
         configuration.putIfAbsent("bootstrap.servers", DEFAULT_KAFKA_BOOTSTRAP_SERVERS);
         configuration.putIfAbsent("request.timeout.ms", DEFAULT_KAFKA_REQUEST_TIMEOUT_MS);
-        configuration.putIfAbsent("connections.max.idle.ms", (long) configuration.get("request.timeout.ms") * 3);
+        configuration.putIfAbsent("connections.max.idle.ms", (int) configuration.get("request.timeout.ms") * 3);
 
         int minimumAvailableNodes = configurationUtil.getInteger(name() + ".minimum-available-nodes")
                 .orElse(DEFAULT_KAFKA_MIN_AVAILABLE_NODES);
@@ -111,7 +111,7 @@ public class KafkaHealthCheck extends KumuluzHealthCheck implements HealthCheck 
 
         configurationUtil.getMapKeys(configurationKey).ifPresent(keys -> {
             keys.forEach(key -> {
-                configurationUtil.get(key).ifPresent(value -> {
+                configurationUtil.get(configurationKey + "." + key).ifPresent(value -> {
                     String newKey = key.replaceAll("-", ".");
                     configuration.put(newKey, value);
                 });
