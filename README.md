@@ -282,7 +282,8 @@ kumuluzee:
       connection-url: jdbc:postgresql://localhost:5432/customers
       username: postgres
       password: postgres
-      max-pool-size: 20
+      pool:
+      	max-size: 20
   health:
     checks:
       data-source-health-check:
