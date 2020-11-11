@@ -26,7 +26,7 @@
 
         <kumuluzee.version>3.8.0</kumuluzee.version>
 
-        <kumuluzee-openapi-mp.version>1.3.0</kumuluzee-openapi-mp.version>
+        <kumuluzee-openapi-mp.version>1.4.0-SNAPSHOT</kumuluzee-openapi-mp.version>
 
         <microprofile-health.version>2.2</microprofile-health.version>
 
@@ -145,7 +145,7 @@
         <!-- OpenAPI MP integration -->
         <dependency>
             <groupId>com.kumuluz.ee.openapi</groupId>
-            <artifactId>kumuluzee-openapi-mp</artifactId>
+            <artifactId>kumuluzee-openapi-mp-common</artifactId>
             <version>${kumuluzee-openapi-mp.version}</version>
             <optional>true</optional>
         </dependency>

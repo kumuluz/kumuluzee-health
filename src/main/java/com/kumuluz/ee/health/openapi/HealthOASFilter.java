@@ -20,9 +20,8 @@
  */
 package com.kumuluz.ee.health.openapi;
 
-import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.health.checks.DataSourceHealthCheck;
-import com.kumuluz.ee.health.utils.HealthServletMappingUtil;
+import com.kumuluz.ee.openapi.mp.spi.ConfigurableOASFilter;
 import io.smallrye.openapi.api.models.ComponentsImpl;
 import io.smallrye.openapi.api.models.OperationImpl;
 import io.smallrye.openapi.api.models.PathItemImpl;
@@ -32,7 +31,6 @@ import io.smallrye.openapi.api.models.media.MediaTypeImpl;
 import io.smallrye.openapi.api.models.media.SchemaImpl;
 import io.smallrye.openapi.api.models.responses.APIResponseImpl;
 import io.smallrye.openapi.api.models.responses.APIResponsesImpl;
-import org.eclipse.microprofile.openapi.OASFilter;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.Operation;
 import org.eclipse.microprofile.openapi.models.PathItem;
@@ -52,24 +50,27 @@ import java.util.Map;
  * @author Urban Malc
  * @since 2.3.0
  */
-public class HealthOASFilter implements OASFilter {
+public class HealthOASFilter implements ConfigurableOASFilter {
 
-    private String servletMapping;
+    private final static String DEFAULT_SERVLET_MAPPING = "/health";
+
+    private Map<String, String> configuration = new HashMap<>();
 
     public HealthOASFilter() {
-        this.servletMapping = HealthServletMappingUtil.getMapping();
-
-        // remove trailing "/*"
-        this.servletMapping = this.servletMapping.substring(0, this.servletMapping.length() - 2);
     }
 
-    private boolean isEnabled() {
-        return ConfigurationUtil.getInstance().getBoolean("kumuluzee.health.openapi-mp.enabled").orElse(false);
+    public HealthOASFilter(boolean enabled, String servletMapping) {
+        configuration.putIfAbsent("enabled", Boolean.toString(enabled));
+        configuration.putIfAbsent("servletMapping", servletMapping);
+    }
+
+    @Override
+    public void configure(String key, String value) {
+        configuration.putIfAbsent(key, value);
     }
 
     @Override
     public void filterOpenAPI(OpenAPI openAPI) {
-
         if (!isEnabled()) {
             return;
         }
@@ -125,10 +126,12 @@ public class HealthOASFilter implements OASFilter {
         PathItem healthLivePath = createHealthPath("Get information about the liveness of this service",
                 null);
 
+        String servletMapping = getServletMapping();
+
         Map<String, PathItem> pathItems = new HashMap<>(openAPI.getPaths().getPathItems());
-        pathItems.put(this.servletMapping, healthPath);
-        pathItems.put(this.servletMapping + "/ready", healthReadyPath);
-        pathItems.put(this.servletMapping + "/live", healthLivePath);
+        pathItems.put(servletMapping, healthPath);
+        pathItems.put(servletMapping + "/ready", healthReadyPath);
+        pathItems.put(servletMapping + "/live", healthLivePath);
 
         openAPI.getPaths().setPathItems(pathItems);
     }
@@ -159,5 +162,19 @@ public class HealthOASFilter implements OASFilter {
         healthPath.setGET(healthGet);
 
         return healthPath;
+    }
+
+    private boolean isEnabled() {
+        return Boolean.parseBoolean(configuration.getOrDefault("enabled", "false"));
+    }
+
+    private String getServletMapping() {
+        String servletMapping = configuration.getOrDefault("servletMapping", DEFAULT_SERVLET_MAPPING);
+
+        if (servletMapping.endsWith("/")) {
+            servletMapping = servletMapping.substring(0, servletMapping.length() - 2);
+        }
+
+        return servletMapping;
     }
 }
