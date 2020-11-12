@@ -44,6 +44,11 @@ public class HealthOASFilterProvider implements OASFilterProvider {
     }
 
     private String getServletMapping() {
-        return HealthServletMappingUtil.getMapping();
+        String mapping = HealthServletMappingUtil.getMapping();
+
+        // remove trailing "/*"
+        mapping = mapping.substring(0, mapping.length() - 2);
+
+        return mapping;
     }
 }

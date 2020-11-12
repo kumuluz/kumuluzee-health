@@ -54,7 +54,7 @@ public class HealthOASFilter implements ConfigurableOASFilter {
 
     private final static String DEFAULT_SERVLET_MAPPING = "/health";
 
-    private Map<String, String> configuration = new HashMap<>();
+    private final Map<String, String> configuration = new HashMap<>();
 
     public HealthOASFilter() {
     }
@@ -113,7 +113,10 @@ public class HealthOASFilter implements ConfigurableOASFilter {
                 .items(healthCheckSchema));
         healthResponseSchema.setProperties(healthResponseSchemaProperties);
 
-        Map<String, Schema> schemas = new HashMap<>(openAPI.getComponents().getSchemas());
+        Map<String, Schema> schemas = (openAPI.getComponents().getSchemas() != null) ?
+                new HashMap<>(openAPI.getComponents().getSchemas())
+                :
+                new HashMap<>();
         schemas.put("HealthStatus", healthStatusSchema);
         schemas.put("HealthResponse", healthResponseSchema);
 
@@ -128,7 +131,10 @@ public class HealthOASFilter implements ConfigurableOASFilter {
 
         String servletMapping = getServletMapping();
 
-        Map<String, PathItem> pathItems = new HashMap<>(openAPI.getPaths().getPathItems());
+        Map<String, PathItem> pathItems = (openAPI.getPaths().getPathItems() != null) ?
+                new HashMap<>(openAPI.getPaths().getPathItems())
+                :
+                new HashMap<>();
         pathItems.put(servletMapping, healthPath);
         pathItems.put(servletMapping + "/ready", healthReadyPath);
         pathItems.put(servletMapping + "/live", healthLivePath);
