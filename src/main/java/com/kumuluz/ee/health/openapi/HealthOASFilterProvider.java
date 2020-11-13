@@ -20,7 +20,9 @@
  */
 package com.kumuluz.ee.health.openapi;
 
-import com.kumuluz.ee.openapi.mp.spi.OasFilterProvider;
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.health.utils.HealthServletMappingUtil;
+import com.kumuluz.ee.openapi.mp.spi.OASFilterProvider;
 import org.eclipse.microprofile.openapi.OASFilter;
 
 /**
@@ -29,10 +31,24 @@ import org.eclipse.microprofile.openapi.OASFilter;
  * @author Urban Malc
  * @since 2.3.0
  */
-public class HealthOASFilterProvider implements OasFilterProvider {
+public class HealthOASFilterProvider implements OASFilterProvider {
 
     @Override
     public OASFilter registerOasFilter() {
-        return new HealthOASFilter();
+        return new HealthOASFilter(isEnabled(), getServletMapping());
+    }
+
+    private boolean isEnabled() {
+        return ConfigurationUtil.getInstance().getBoolean("kumuluzee.health.openapi-mp.enabled")
+                .orElse(false);
+    }
+
+    private String getServletMapping() {
+        String mapping = HealthServletMappingUtil.getMapping();
+
+        // remove trailing "/*"
+        mapping = mapping.substring(0, mapping.length() - 2);
+
+        return mapping;
     }
 }
