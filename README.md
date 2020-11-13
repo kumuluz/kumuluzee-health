@@ -520,9 +520,8 @@ Example configuration:
 To enable Kafka cluster health check provide the `bootstrap-servers` urls as a comma separated list. The default value
 is `localhost:9092`.
 
-Additionally, you can supply the `request-timeout-ms` value (default is `5000`) and the `minimum-available-nodes` value
-(default is `1`). The latter represents the minimum number of available nodes in the cluster in order for the health
-check to be considered successful.
+You can supply the `minimum-available-nodes` value (default is `1`). The value represents the minimum number of
+available nodes in the cluster in order for the health check to be considered successful.
 
 Example of the configuration:
 
@@ -535,6 +534,10 @@ kumuluzee:
         minimum-available-nodes: 2
         request-timeout-ms: 1000
 ```
+
+Additionally, all properties defined in the subtree `kumuluzee.health.checks.kafka-health-check` are forwarded to Kafka
+client (see [CONFGIGURATION](https://kafka.apache.org/documentation/#configuration)). Note that dots (`.`) are replaced
+with minuses (`-`), e.g. `request.timeout.ms` becomes `request-timeout-ms`.
 
 The following dependency needs to be provided in order for the health check to function correctly
 (when using `kumuluzee-streaming` library the dependency is already provided):
