@@ -26,7 +26,7 @@
 
         <kumuluzee.version>3.8.0</kumuluzee.version>
 
-        <kumuluzee-openapi-mp.version>1.4.0-SNAPSHOT</kumuluzee-openapi-mp.version>
+        <kumuluzee-openapi-mp.version>1.4.0</kumuluzee-openapi-mp.version>
 
         <microprofile-health.version>2.2</microprofile-health.version>
 
