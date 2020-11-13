@@ -84,6 +84,9 @@ public class HealthOASFilter implements ConfigurableOASFilter {
         if (openAPI.getPaths() == null) {
             openAPI.paths(new PathsImpl());
         }
+        if (openAPI.getPaths().getPathItems() == null) {
+            openAPI.getPaths().setPathItems(new HashMap<>());
+        }
 
         Schema healthStatusSchema = new SchemaImpl();
         healthStatusSchema.setType(Schema.SchemaType.STRING);
@@ -113,10 +116,7 @@ public class HealthOASFilter implements ConfigurableOASFilter {
                 .items(healthCheckSchema));
         healthResponseSchema.setProperties(healthResponseSchemaProperties);
 
-        Map<String, Schema> schemas = (openAPI.getComponents().getSchemas() != null) ?
-                new HashMap<>(openAPI.getComponents().getSchemas())
-                :
-                new HashMap<>();
+        Map<String, Schema> schemas = new HashMap<>(openAPI.getComponents().getSchemas());
         schemas.put("HealthStatus", healthStatusSchema);
         schemas.put("HealthResponse", healthResponseSchema);
 
@@ -131,10 +131,7 @@ public class HealthOASFilter implements ConfigurableOASFilter {
 
         String servletMapping = getServletMapping();
 
-        Map<String, PathItem> pathItems = (openAPI.getPaths().getPathItems() != null) ?
-                new HashMap<>(openAPI.getPaths().getPathItems())
-                :
-                new HashMap<>();
+        Map<String, PathItem> pathItems = new HashMap<>(openAPI.getPaths().getPathItems());
         pathItems.put(servletMapping, healthPath);
         pathItems.put(servletMapping + "/ready", healthReadyPath);
         pathItems.put(servletMapping + "/live", healthLivePath);
