@@ -24,11 +24,14 @@ import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,25 +50,17 @@ public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthC
 
     @Override
     public HealthCheckResponse call() {
-        Connection connection = null;
+        HealthCheckResponseBuilder healthCheckResponseBuilder = HealthCheckResponse
+                .named(DataSourceHealthCheck.class.getSimpleName())
+                .up();
 
-        try {
-            connection = getConnection();
-            return HealthCheckResponse.up(DataSourceHealthCheck.class.getSimpleName());
-        } catch (Exception exception) {
-            LOG.log(Level.SEVERE, "An exception occurred when trying to establish connection to data source.",
-                    exception);
-            return HealthCheckResponse.down(DataSourceHealthCheck.class.getSimpleName());
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException exception) {
-                    LOG.log(Level.SEVERE, "An exception occurred when trying to close connection to data source.",
-                            exception);
-                }
-            }
+        List<DataSourceHealthCheckConfiguration> configurationList = getConfigurationList();
+
+        for (DataSourceHealthCheckConfiguration configuration : configurationList) {
+            checkConnection(configuration, healthCheckResponseBuilder);
         }
+
+        return healthCheckResponseBuilder.build();
     }
 
     @Override
@@ -83,41 +78,137 @@ public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthC
         return true;
     }
 
-    /**
-     * Helper method for retrieving connection.
-     *
-     * @return connection
-     * @throws SQLException
-     */
-    private Connection getConnection() throws SQLException {
+    private List<DataSourceHealthCheckConfiguration> getConfigurationList() {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
-        Optional<String> jndiName = configurationUtil.get(name() + ".jndi-name");
-        Optional<Integer> dsSizeOpt = configurationUtil.getListSize("kumuluzee.datasources");
+        List<DataSourceHealthCheckConfiguration> configurationList = new ArrayList<>();
 
-        String connectionUrl = null;
-        String username = null;
-        String password = null;
+        Optional<Integer> datasourcesListSizeOptional = ConfigurationUtil.getInstance().getListSize(name());
 
-        if (jndiName.isPresent() && dsSizeOpt.isPresent()) {
-            for (int i = 0; i < dsSizeOpt.get(); i++) {
-                String prefix = "kumuluzee.datasources[" + i + "]";
-                Optional<String> dsJndiName = configurationUtil.get(prefix + ".jndi-name");
+        boolean hasJndiNameReference = false;
+        if (datasourcesListSizeOptional.isPresent()) {
+            for (int i = 0; i < datasourcesListSizeOptional.get(); i++) {
+                DataSourceHealthCheckConfiguration configuration = new DataSourceHealthCheckConfiguration();
 
-                if (dsJndiName.isPresent() && dsJndiName.get().equals(jndiName.get())) {
-                    connectionUrl = configurationUtil.get(prefix + ".connection-url").orElse(null);
-                    username = configurationUtil.get(prefix + ".username").orElse(null);
-                    password = configurationUtil.get(prefix + ".password").orElse(null);
-                    break;
+                Optional<String> jndiNameOptional = configurationUtil.get(name() + "[" + i + "].jndi-name");
+                if (jndiNameOptional.isPresent()) {
+                    configuration.setJndiName(jndiNameOptional.get());
+
+                    hasJndiNameReference = true;
+                } else {
+                    configurationUtil.get(name() + "[" + i + "].connection-url").ifPresent(configuration::setConnectionUrl);
+                    configurationUtil.get(name() + "[" + i + "].username").ifPresent(configuration::setUsername);
+                    configurationUtil.get(name() + "[" + i + "].password").ifPresent(configuration::setPassword);
                 }
+
+                configurationList.add(configuration);
             }
         } else {
-            connectionUrl = configurationUtil.get(name() + ".connection-url").orElse(null);
-            username = configurationUtil.get(name() + ".username").orElse(null);
-            password = configurationUtil.get(name() + ".password").orElse(null);
+            DataSourceHealthCheckConfiguration configuration = new DataSourceHealthCheckConfiguration();
+
+            Optional<String> jndiNameOptional = configurationUtil.get(name() + ".jndi-name");
+            if (jndiNameOptional.isPresent()) {
+                configuration.setJndiName(jndiNameOptional.get());
+
+                hasJndiNameReference = true;
+            } else {
+                configurationUtil.get(name() + ".connection-url").ifPresent(configuration::setConnectionUrl);
+                configurationUtil.get(name() + ".username").ifPresent(configuration::setUsername);
+                configurationUtil.get(name() + ".password").ifPresent(configuration::setPassword);
+            }
+
+            configurationList.add(configuration);
         }
 
-        return username != null && password != null ? DriverManager.getConnection(connectionUrl, username, password) :
-                DriverManager.getConnection(connectionUrl);
+        Optional<Integer> dsSizeOpt = configurationUtil.getListSize("kumuluzee.datasources");
+        if (hasJndiNameReference && dsSizeOpt.isPresent()) {
+            for (DataSourceHealthCheckConfiguration configuration : configurationList) {
+                if (configuration.getJndiName() == null) {
+                    continue;
+                }
+
+                for (int i = 0; i < dsSizeOpt.get(); i++) {
+                    String prefix = "kumuluzee.datasources[" + i + "]";
+                    Optional<String> dsJndiName = configurationUtil.get(prefix + ".jndi-name");
+
+                    if (dsJndiName.isPresent() && dsJndiName.get().equals(configuration.getJndiName())) {
+                        configurationUtil.get(prefix + ".connection-url").ifPresent(configuration::setConnectionUrl);
+                        configurationUtil.get(prefix + ".username").ifPresent(configuration::setUsername);
+                        configurationUtil.get(prefix + ".password").ifPresent(configuration::setPassword);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return configurationList;
+    }
+
+    /**
+     * Helper method for checking connection.
+     */
+    private void checkConnection(DataSourceHealthCheckConfiguration configuration, HealthCheckResponseBuilder healthCheckResponseBuilder) {
+        Connection connection = null;
+
+        try {
+            if (configuration.getUsername() == null && configuration.getPassword() == null) {
+                connection = DriverManager.getConnection(configuration.getConnectionUrl());
+            } else {
+                connection = DriverManager.getConnection(configuration.getConnectionUrl(), configuration.getUsername(), configuration.getPassword());
+            }
+
+            healthCheckResponseBuilder.withData(configuration.getConnectionUrl(), HealthCheckResponse.State.UP.toString());
+        } catch (Exception exception) {
+            LOG.log(Level.SEVERE, String.format("An exception occurred when trying to establish connection to data source (%s).", configuration.getConnectionUrl()), exception);
+            healthCheckResponseBuilder.withData(configuration.getConnectionUrl(), HealthCheckResponse.State.DOWN.toString());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException exception) {
+                    LOG.log(Level.SEVERE, String.format("An exception occurred when trying to close connection to data source (%s).", configuration.getConnectionUrl()), exception);
+                }
+            }
+        }
+    }
+}
+
+class DataSourceHealthCheckConfiguration {
+
+    private String jndiName;
+    private String connectionUrl;
+    private String username;
+    private String password;
+
+    public String getJndiName() {
+        return jndiName;
+    }
+
+    public void setJndiName(String jndiName) {
+        this.jndiName = jndiName;
+    }
+
+    public String getConnectionUrl() {
+        return connectionUrl;
+    }
+
+    public void setConnectionUrl(String connectionUrl) {
+        this.connectionUrl = connectionUrl;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
