@@ -271,7 +271,8 @@ below configuration of _DataSourceHealthCheck_.
 ### DataSourceHealthCheck
 
 To enable data source availability health check, we need to provide in the health check sections. `Jndi-name`,
-`connection-url`, `username` and `password` need to be provided as part of the health check configuration.
+`connection-url`, `username` and `password` need to be provided as part of the health check configuration. Note that 
+multiple data source health checks are supported.
 
 Example configuration:
 
@@ -284,11 +285,19 @@ kumuluzee:
       password: postgres
       pool:
       	max-size: 20
+    - jndi-name: jdbc/OrdersDS
+      connection-url: jdbc:postgresql://localhost:5433/orders
+      username: postgres
+      password: postgres
+      pool:
+      	max-size: 20
   health:
     checks:
-      data-source-health-check:
-        type: liveness
-        jndi-name: jdbc/CustomersDS
+      data-source-health-checks
+        - jndi-name: jdbc/CustomersDS
+	  type: liveness
+	- jndi-name: jdbc/OrdersDS
+	  type: liveness
 ```
 
 Another example of the configuration:
