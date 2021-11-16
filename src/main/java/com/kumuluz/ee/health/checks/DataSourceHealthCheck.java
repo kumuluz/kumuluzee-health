@@ -161,6 +161,7 @@ public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthC
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, String.format("An exception occurred when trying to establish connection to data source (%s).", configuration.getConnectionUrl()), exception);
             healthCheckResponseBuilder.withData(configuration.getConnectionUrl(), HealthCheckResponse.State.DOWN.toString());
+            healthCheckResponseBuilder.down();
         } finally {
             if (connection != null) {
                 try {
