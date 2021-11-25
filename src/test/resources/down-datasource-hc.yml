@@ -3,7 +3,7 @@ kumuluzee:
     - jndi-name: jdbc/ds1
       connection-url: jdbc:h2:~/test1
     - jndi-name: jdbc/ds2
-      connection-url: jdbc:h2:tcp://localhost/~/test
+      connection-url: jdbc:h2:tcp://localhost:<h2_port>/~/test # <h2_port> is replaced when loading this resource
 
   health:
     checks:

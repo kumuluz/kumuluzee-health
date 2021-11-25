@@ -57,8 +57,6 @@ public class DatasourceBothHealthCheckTest extends Arquillian {
         JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class)
                 .addAsResource("both-datasource-hc.yml", "config.yml");
 
-        javaArchive.merge(Maven.resolver().resolve("com.h2database:h2:1.4.200").withoutTransitivity().asSingle(JavaArchive.class));
-
         return javaArchive;
     }
 

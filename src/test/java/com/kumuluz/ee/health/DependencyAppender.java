@@ -47,6 +47,8 @@ public class DependencyAppender implements MavenDependencyAppender {
         libs.add("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:" +
                 versionsBundle.getString("jackson-version"));
 
+        libs.add("com.h2database:h2:" + versionsBundle.getString("h2-version"));
+
         return libs;
     }
 }

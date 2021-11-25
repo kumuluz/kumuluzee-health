@@ -33,7 +33,6 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.junit.Before;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -43,7 +42,9 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class DatasourceDownHealthCheckTest extends Arquillian {
 
@@ -54,21 +55,22 @@ public class DatasourceDownHealthCheckTest extends Arquillian {
 
     @Deployment
     public static JavaArchive createDeployment() throws SQLException {
+
         h2Server = Server.createTcpServer("-ifNotExists").start();
 
+        String config;
+        try {
+            config = new String(Objects.requireNonNull(
+                    DatasourceDownHealthCheckTest.class.getClassLoader().getResourceAsStream("down-datasource-hc.yml"),
+                    "Could not load config.yml"
+            ).readAllBytes(), StandardCharsets.UTF_8)
+                    .replace("<h2_port>", String.valueOf(h2Server.getPort()));
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not load config.yml", e);
+        }
+
         JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class)
-                .addAsResource(new StringAsset("kumuluzee:\n" +
-                        "  datasources:\n" +
-                        "    - jndi-name: jdbc/ds1\n" +
-                        "      connection-url: jdbc:h2:~/test1\n" +
-                        "    - jndi-name: jdbc/ds2\n" +
-                        "      connection-url: jdbc:h2:tcp://localhost:" + h2Server.getPort() + "/~/test\n" +
-                        "\n" +
-                        "  health:\n" +
-                        "    checks:\n" +
-                        "      data-source-health-check:\n" +
-                        "        - jndi-name: jdbc/ds1\n" +
-                        "        - jndi-name: jdbc/ds2\n"), "config.yml");
+                .addAsResource(new StringAsset(config), "config.yml");
 
         javaArchive.merge(Maven.resolver().resolve("com.h2database:h2:1.4.200").withoutTransitivity().asSingle(JavaArchive.class));
 
