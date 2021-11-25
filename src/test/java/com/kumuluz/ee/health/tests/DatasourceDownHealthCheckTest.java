@@ -40,11 +40,13 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class DatasourceDownHealthCheckTest extends Arquillian {
 
@@ -58,16 +60,11 @@ public class DatasourceDownHealthCheckTest extends Arquillian {
 
         h2Server = Server.createTcpServer("-ifNotExists").start();
 
-        String config;
-        try {
-            config = new String(Objects.requireNonNull(
-                    DatasourceDownHealthCheckTest.class.getClassLoader().getResourceAsStream("down-datasource-hc.yml"),
-                    "Could not load config.yml"
-            ).readAllBytes(), StandardCharsets.UTF_8)
-                    .replace("<h2_port>", String.valueOf(h2Server.getPort()));
-        } catch (IOException e) {
-            throw new IllegalStateException("Could not load config.yml", e);
-        }
+        String config = new BufferedReader(new InputStreamReader(Objects.requireNonNull(
+                DatasourceDownHealthCheckTest.class.getClassLoader().getResourceAsStream("down-datasource-hc.yml"),
+                "Could not load config.yml"
+        ))).lines().collect(Collectors.joining("\n"))
+                .replace("<h2_port>", String.valueOf(h2Server.getPort()));
 
         JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class)
                 .addAsResource(new StringAsset(config), "config.yml");
