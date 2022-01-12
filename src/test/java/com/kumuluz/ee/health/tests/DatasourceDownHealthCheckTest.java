@@ -32,7 +32,6 @@ import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -66,12 +65,8 @@ public class DatasourceDownHealthCheckTest extends Arquillian {
         ))).lines().collect(Collectors.joining("\n"))
                 .replace("<h2_port>", String.valueOf(h2Server.getPort()));
 
-        JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class)
+        return ShrinkWrap.create(JavaArchive.class)
                 .addAsResource(new StringAsset(config), "config.yml");
-
-        javaArchive.merge(Maven.resolver().resolve("com.h2database:h2:1.4.200").withoutTransitivity().asSingle(JavaArchive.class));
-
-        return javaArchive;
     }
 
     @Test
@@ -85,8 +80,8 @@ public class DatasourceDownHealthCheckTest extends Arquillian {
         Assert.assertEquals(checks.size(), 1);
         Assert.assertEquals(checks.get(0).asJsonObject().getString("name"), "DataSourceHealthCheck");
         Assert.assertEquals(checks.get(0).asJsonObject().getString("status"), "DOWN");
-        Assert.assertEquals(checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:~/test1"), "UP");
-        Assert.assertEquals(checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:tcp://localhost:" + h2Server.getPort() + "/~/test"), "DOWN");
+        Assert.assertEquals(checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:mem:test1"), "UP");
+        Assert.assertEquals(checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:tcp://localhost:" + h2Server.getPort() + "/mem:test2"), "DOWN");
     }
 
     private JsonObject getHealthApiResponse(String healthPath) throws IOException {

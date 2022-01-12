@@ -30,7 +30,6 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -54,10 +53,9 @@ public class DatasourceMultipleHealthCheckTest extends Arquillian {
 
     @Deployment
     public static JavaArchive createDeployment() {
-        JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class)
-                .addAsResource("multiple-datasource-hc.yml", "config.yml");
 
-        return javaArchive;
+        return ShrinkWrap.create(JavaArchive.class)
+                .addAsResource("multiple-datasource-hc.yml", "config.yml");
     }
 
     @Test
@@ -69,8 +67,8 @@ public class DatasourceMultipleHealthCheckTest extends Arquillian {
         Assert.assertEquals(checks.size(), 1);
         Assert.assertEquals("DataSourceHealthCheck", checks.get(0).asJsonObject().getString("name"));
         Assert.assertEquals("UP", checks.get(0).asJsonObject().getString("status"));
-        Assert.assertEquals("UP", checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:~/test1"));
-        Assert.assertEquals("UP", checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:~/test2"));
+        Assert.assertEquals("UP", checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:mem:test1"));
+        Assert.assertEquals("UP", checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:mem:test2"));
     }
 
     private JsonObject getHealthApiResponse(String healthPath) throws IOException {

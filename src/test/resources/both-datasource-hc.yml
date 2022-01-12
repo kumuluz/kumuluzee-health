@@ -1,7 +1,7 @@
 kumuluzee:
   datasources:
     - jndi-name: jdbc/ds
-      connection-url: jdbc:h2:~/test
+      connection-url: jdbc:h2:mem:test
 
   health:
     checks:

@@ -30,7 +30,6 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -54,10 +53,9 @@ public class DatasourceBothHealthCheckTest extends Arquillian {
 
     @Deployment
     public static JavaArchive createDeployment() {
-        JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class)
-                .addAsResource("both-datasource-hc.yml", "config.yml");
 
-        return javaArchive;
+        return ShrinkWrap.create(JavaArchive.class)
+                .addAsResource("both-datasource-hc.yml", "config.yml");
     }
 
     @Test
