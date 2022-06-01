@@ -37,6 +37,8 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.util.AnnotationLiteral;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -91,18 +93,24 @@ public class HealthCheckInitializationExtension implements Extension {
     }
 
     private KumuluzHealthCheck getBuildInHealthCheckBeanInstance(Bean<?> bean) {
+
         if (KumuluzHealthCheck.class.isAssignableFrom(bean.getBeanClass())) {
             try {
-                KumuluzHealthCheck instance = (KumuluzHealthCheck) bean.getBeanClass().newInstance();
+                KumuluzHealthCheck instance = (KumuluzHealthCheck) bean.getBeanClass().getDeclaredConstructor().newInstance();
                 String kumuluzHealthCheckName = instance.name();
 
-                if (ConfigurationUtil.getInstance().get(kumuluzHealthCheckName).isPresent()) {
+                Optional<List<String>> healthCheckConfigRoot = ConfigurationUtil.getInstance().getMapKeys(kumuluzHealthCheckName);
+                // DataSourceHealthCheck list is also valid
+                Optional<Integer> healthCheckConfigRootList = ConfigurationUtil.getInstance().getListSize(kumuluzHealthCheckName);
+
+                if ((healthCheckConfigRoot.isPresent() && !healthCheckConfigRoot.get().isEmpty()) ||
+                        (healthCheckConfigRootList.isPresent() && healthCheckConfigRootList.get() > 0)) {
+
                     if (instance.initSuccess()) {
                         return instance;
                     }
                 }
-            } catch (Exception e) {
-
+            } catch (Exception ignored) {
             }
         }
         return null;
