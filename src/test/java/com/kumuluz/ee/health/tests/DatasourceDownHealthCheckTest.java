@@ -21,8 +21,8 @@
 package com.kumuluz.ee.health.tests;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.h2.tools.Server;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -74,22 +74,24 @@ public class DatasourceDownHealthCheckTest extends Arquillian {
     public void healthApiShouldReturnDown() throws IOException {
         h2Server.stop();
 
-        JsonObject healthApiResponse = getHealthApiResponse("/health");
+        JsonObject healthApiResponse = getHealthApiResponse();
         Assert.assertNotNull(healthApiResponse);
         JsonArray checks = healthApiResponse.getJsonArray("checks");
         Assert.assertEquals(checks.size(), 1);
-        Assert.assertEquals(checks.get(0).asJsonObject().getString("name"), "DataSourceHealthCheck");
-        Assert.assertEquals(checks.get(0).asJsonObject().getString("status"), "DOWN");
-        Assert.assertEquals(checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:mem:test1"), "UP");
-        Assert.assertEquals(checks.get(0).asJsonObject().getJsonObject("data").getString("jdbc:h2:tcp://localhost:" + h2Server.getPort() + "/mem:test2"), "DOWN");
+        Assert.assertEquals(((JsonObject) checks.get(0)).getString("name"), "DataSourceHealthCheck");
+        Assert.assertEquals(((JsonObject) checks.get(0)).getString("status"), "DOWN");
+        Assert.assertEquals(((JsonObject) checks.get(0)).getJsonObject("data").getString("jdbc:h2:mem:test1"), "UP");
+        Assert.assertEquals(((JsonObject) checks.get(0)).getJsonObject("data").getString("jdbc:h2:tcp://localhost:" + h2Server.getPort() + "/mem:test2"), "DOWN");
     }
 
-    private JsonObject getHealthApiResponse(String healthPath) throws IOException {
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpResponse response = client.execute(new HttpGet(uri + healthPath));
-        Assert.assertEquals(response.getStatusLine().getStatusCode(), 503);
+    private JsonObject getHealthApiResponse() throws IOException {
 
-        JsonReader jsonReader = Json.createReader(response.getEntity().getContent());
-        return jsonReader.readObject();
+        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+            HttpResponse response = client.execute(new HttpGet(uri + "/health"));
+            Assert.assertEquals(response.getStatusLine().getStatusCode(), 503);
+
+            JsonReader jsonReader = Json.createReader(response.getEntity().getContent());
+            return jsonReader.readObject();
+        }
     }
 }

@@ -24,7 +24,7 @@
 
         <jaxb-api.version>2.3.1</jaxb-api.version>
 
-        <kumuluzee.version>3.8.0</kumuluzee.version>
+        <kumuluzee.version>4.0.0</kumuluzee.version>
 
         <kumuluzee-openapi-mp.version>1.4.0</kumuluzee-openapi-mp.version>
 
