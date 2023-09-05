@@ -34,7 +34,7 @@
         <jedis.version>3.0.1</jedis.version>
         <mongo-driver.version>3.10.2</mongo-driver.version>
         <amqp-client.version>5.7.2</amqp-client.version>
-        <kafka-clients.version>2.6.0</kafka-clients.version>
+        <kafka-clients.version>2.6.3</kafka-clients.version>
 
         <testng.version>6.9.9</testng.version>
         <kumuluzee-arquillian-container.version>1.1.0</kumuluzee-arquillian-container.version>
