@@ -6,7 +6,7 @@
 
     <groupId>com.kumuluz.ee.health</groupId>
     <artifactId>kumuluzee-health</artifactId>
-    <version>2.4.4</version>
+    <version>2.5.0</version>
 
     <name>KumuluzEE Health</name>
 
@@ -18,19 +18,19 @@
     <url>https://ee.kumuluz.com</url>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jaxb-api.version>2.3.1</jaxb-api.version>
 
-        <kumuluzee.version>3.8.0</kumuluzee.version>
+        <kumuluzee.version>4.1.0</kumuluzee.version>
 
         <kumuluzee-openapi-mp.version>1.4.0</kumuluzee-openapi-mp.version>
 
         <microprofile-health.version>2.2</microprofile-health.version>
 
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.12.0</jackson.version>
         <jedis.version>3.0.1</jedis.version>
         <mongo-driver.version>3.10.2</mongo-driver.version>
         <amqp-client.version>5.7.2</amqp-client.version>
@@ -39,7 +39,7 @@
         <testng.version>6.9.9</testng.version>
         <kumuluzee-arquillian-container.version>1.1.0</kumuluzee-arquillian-container.version>
         <httpclient.version>4.5.13</httpclient.version>
-        <h2.version>2.1.210</h2.version>
+        <h2.version>2.3.230</h2.version>
 
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
         <nexus.staging.plugin.version>1.6.8</nexus.staging.plugin.version>
@@ -129,7 +129,32 @@
             <artifactId>jackson-datatype-jdk8</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>2.0.1</version>
+        </dependency>
         <!-- clients -->
         <dependency>
             <groupId>redis.clients</groupId>
