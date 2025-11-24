@@ -64,8 +64,8 @@ public class HealthCheckLogger implements Runnable {
             HealthResponse healthResponse = new HealthResponse();
             healthResponse.setChecks(results);
             healthResponse.setStatus(
-                    results.stream().anyMatch(result -> result.getState().equals(HealthCheckResponse.State.DOWN)) ?
-                            HealthCheckResponse.State.DOWN : HealthCheckResponse.State.UP);
+                    results.stream().anyMatch(result -> result.getStatus().equals(HealthCheckResponse.Status.DOWN)) ?
+                            HealthCheckResponse.Status.DOWN : HealthCheckResponse.Status.UP);
 
             LOG.log(LEVEL, this.mapper.writer().writeValueAsString(healthResponse));
         } catch (Exception exception) {

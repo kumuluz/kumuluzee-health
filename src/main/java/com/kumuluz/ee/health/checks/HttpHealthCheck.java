@@ -79,7 +79,7 @@ public class HttpHealthCheck extends KumuluzHealthCheck implements HealthCheck {
             response = webTarget.request().head();
 
             if (response.getStatus() >= 200 && response.getStatus() < 300) {
-                healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.State.UP.toString());
+                healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.Status.UP.toString());
                 return;
             }
         } catch (Exception exception) {
@@ -89,7 +89,7 @@ public class HttpHealthCheck extends KumuluzHealthCheck implements HealthCheck {
                 response.close();
             }
         }
-        healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.State.DOWN.toString());
+        healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.Status.DOWN.toString());
         healthCheckResponseBuilder.down();
     }
 

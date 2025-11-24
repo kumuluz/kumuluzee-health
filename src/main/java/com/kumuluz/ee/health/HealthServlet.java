@@ -81,13 +81,13 @@ public class HealthServlet extends HttpServlet {
             // prepare response
             HealthResponse healthResponse = new HealthResponse();
             healthResponse.setChecks(results);
-            healthResponse.setStatus(HealthCheckResponse.State.UP);
+            healthResponse.setStatus(HealthCheckResponse.Status.UP);
 
             // check if any check is down
             for (HealthCheckResponse result : results) {
-                if (HealthCheckResponse.State.DOWN.equals(result.getState())) {
+                if (HealthCheckResponse.Status.DOWN.equals(result.getStatus())) {
                     response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                    healthResponse.setStatus(HealthCheckResponse.State.DOWN);
+                    healthResponse.setStatus(HealthCheckResponse.Status.DOWN);
                     break;
                 }
             }
@@ -130,6 +130,8 @@ public class HealthServlet extends HttpServlet {
             return HealthCheckType.LIVENESS;
         } else if (request.getRequestURI().endsWith(servletMapping + "/ready")) {
             return HealthCheckType.READINESS;
+        } else if (request.getRequestURI().endsWith(servletMapping + "/started")) {
+            return HealthCheckType.STARTUP;
         } else {
             return HealthCheckType.BOTH;
         }

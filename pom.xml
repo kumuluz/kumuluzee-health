@@ -28,7 +28,7 @@
 
         <kumuluzee-openapi-mp.version>1.4.0</kumuluzee-openapi-mp.version>
 
-        <microprofile-health.version>2.2</microprofile-health.version>
+        <microprofile-health.version>3.1</microprofile-health.version>
 
         <jackson.version>2.12.0</jackson.version>
         <jedis.version>3.0.1</jedis.version>
@@ -146,14 +146,14 @@
         </dependency>
 
         <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-            <version>2.0.1</version>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.1.4</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.json</artifactId>
-            <version>2.0.1</version>
+            <artifactId>javax.json</artifactId>
+            <version>1.1.4</version>
         </dependency>
         <!-- clients -->
         <dependency>
