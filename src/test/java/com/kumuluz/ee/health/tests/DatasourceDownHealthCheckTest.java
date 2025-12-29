@@ -80,8 +80,8 @@ public class DatasourceDownHealthCheckTest extends Arquillian {
         Assert.assertEquals(checks.size(), 1);
         Assert.assertEquals(((JsonObject) checks.get(0)).getString("name"), "DataSourceHealthCheck");
         Assert.assertEquals(((JsonObject) checks.get(0)).getString("status"), "DOWN");
-        Assert.assertEquals(((JsonObject) checks.get(0)).getJsonObject("data").getString("jdbc:h2:mem:test1"), "UP");
-        Assert.assertEquals(((JsonObject) checks.get(0)).getJsonObject("data").getString("jdbc:h2:tcp://localhost:" + h2Server.getPort() + "/mem:test2"), "DOWN");
+        Assert.assertEquals(((JsonObject) checks.get(0)).getJsonObject("data").getString("jdbc/ds1"), "UP");
+        Assert.assertEquals(((JsonObject) checks.get(0)).getJsonObject("data").getString("jdbc/ds2"), "DOWN");
     }
 
     private JsonObject getHealthApiResponse() throws IOException {

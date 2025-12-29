@@ -157,10 +157,17 @@ public class DataSourceHealthCheck extends KumuluzHealthCheck implements HealthC
                 connection = DriverManager.getConnection(configuration.getConnectionUrl(), configuration.getUsername(), configuration.getPassword());
             }
 
-            healthCheckResponseBuilder.withData(configuration.getConnectionUrl(), HealthCheckResponse.Status.UP.toString());
+            // Only include identifier if JNDI name is available
+            if (configuration.getJndiName() != null && !configuration.getJndiName().isEmpty()) {
+                healthCheckResponseBuilder.withData(configuration.getJndiName(), HealthCheckResponse.Status.UP.toString());
+            }
         } catch (Exception exception) {
             LOG.log(Level.SEVERE, String.format("An exception occurred when trying to establish connection to data source (%s).", configuration.getConnectionUrl()), exception);
-            healthCheckResponseBuilder.withData(configuration.getConnectionUrl(), HealthCheckResponse.Status.DOWN.toString());
+
+            // Only include identifier if JNDI name is available
+            if (configuration.getJndiName() != null && !configuration.getJndiName().isEmpty()) {
+                healthCheckResponseBuilder.withData(configuration.getJndiName(), HealthCheckResponse.Status.DOWN.toString());
+            }
             healthCheckResponseBuilder.down();
         } finally {
             if (connection != null) {

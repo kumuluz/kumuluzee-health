@@ -41,38 +41,36 @@ import java.io.IOException;
 import java.net.URI;
 
 /**
- * Test Datasource readiness liveness both
+ * Test Datasource health check without JNDI name.
+ * Verifies that no data field is included when JNDI name is not configured.
  *
- * @author Gregor Porocnik
- * @since 2.2.0
+ * @since 2.7.0
  */
-public class DatasourceMultipleHealthCheckTest extends Arquillian {
+public class DatasourceNoJndiHealthCheckTest extends Arquillian {
 
     @ArquillianResource
     private URI uri;
 
     @Deployment
     public static JavaArchive createDeployment() {
-
         return ShrinkWrap.create(JavaArchive.class)
-                .addAsResource("multiple-datasource-hc.yml", "config.yml");
+                .addAsResource("no-jndi-datasource-hc.yml", "config.yml");
     }
 
     @Test
     @RunAsClient
-    public void healthApiShouldReturnUp() throws IOException {
+    public void healthApiShouldReturnUpWithoutData() throws IOException {
         JsonObject healthApiResponse = getHealthApiResponse();
         Assert.assertNotNull(healthApiResponse);
         JsonArray checks = healthApiResponse.getJsonArray("checks");
         Assert.assertEquals(checks.size(), 1);
-        Assert.assertEquals("DataSourceHealthCheck", ((JsonObject) checks.get(0)).getString("name"));
-        Assert.assertEquals("UP", ((JsonObject) checks.get(0)).getString("status"));
-        Assert.assertEquals("UP", ((JsonObject) checks.get(0)).getJsonObject("data").getString("jdbc/ds1"));
-        Assert.assertEquals("UP", ((JsonObject) checks.get(0)).getJsonObject("data").getString("jdbc/ds2"));
+        JsonObject checkResponse = (JsonObject) checks.get(0);
+        Assert.assertEquals("DataSourceHealthCheck", checkResponse.getString("name"));
+        Assert.assertEquals("UP", checkResponse.getString("status"));
+        Assert.assertFalse(checkResponse.containsKey("data"), "Data field should not be present when JNDI name is not configured");
     }
 
     private JsonObject getHealthApiResponse() throws IOException {
-
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpResponse response = client.execute(new HttpGet(uri + "/health"));
             Assert.assertEquals(response.getStatusLine().getStatusCode(), 200);

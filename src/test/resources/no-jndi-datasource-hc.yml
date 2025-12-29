@@ -1,0 +1,5 @@
+kumuluzee:
+  health:
+    checks:
+      data-source-health-check:
+        connection-url: jdbc:h2:mem:test

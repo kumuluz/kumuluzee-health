@@ -271,8 +271,11 @@ below configuration of _DataSourceHealthCheck_.
 ### DataSourceHealthCheck
 
 To enable data source availability health check, we need to provide in the health check sections. `Jndi-name`,
-`connection-url`, `username` and `password` need to be provided as part of the health check configuration. Note that 
+`connection-url`, `username` and `password` need to be provided as part of the health check configuration. Note that
 multiple data source health checks are supported.
+
+When JNDI names are configured, they are used as identifiers in the health check response. For multiple datasources,
+JNDI names should be used to distinguish between them in the response.
 
 Example configuration:
 
@@ -300,7 +303,20 @@ kumuluzee:
 	  type: liveness
 ```
 
-Another example of the configuration:
+Response example:
+
+```json
+{
+  "name": "DataSourceHealthCheck",
+  "status": "UP",
+  "data": {
+    "jdbc/CustomersDS": "UP",
+    "jdbc/OrdersDS": "UP"
+  }
+}
+```
+
+Configuration without JNDI name:
 
 ```yaml
 kumuluzee:
@@ -312,15 +328,9 @@ kumuluzee:
         password: db2
 ```
 
-Another example of the configuration:
-
-```yaml
-kumuluzee:
-  health:
-    checks:
-      data-source-health-check:
-        connection-url: jdbc:mysql://localhost:3306/customers?user=mysql&password=mysql
-```
+Note: When JNDI name is not configured, no identifier will be included in the health check response data field.
+For multiple datasources without JNDI names, it will not be possible to distinguish which datasource is up or down
+from the health check response.
 
 To enable data source availability health check, we also need to provide a database driver library in pom.xml.
 
