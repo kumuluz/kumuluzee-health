@@ -1,5 +1,5 @@
 # KumuluzEE Health
-[![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-health/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-health)
+[![KumuluzEE CI](https://github.com/kumuluz/kumuluzee-health/actions/workflows/kumuluzee-ci.yml/badge.svg)](https://github.com/kumuluz/kumuluzee-health/actions/workflows/kumuluzee-ci.yml)
 
 > KumuluzEE Health project provides consistent, unified way of performing microservice health checks and exposing health
   information.
