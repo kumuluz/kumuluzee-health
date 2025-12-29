@@ -81,7 +81,7 @@ public class EtcdHealthCheck extends KumuluzHealthCheck implements HealthCheck {
                 String result = response.readEntity(String.class).replaceAll("\\s+", "");
 
                 if (result != null && result.equals(HEALTHY)) {
-                    healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.State.UP.toString());
+                    healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.Status.UP.toString());
                     return;
                 }
             }
@@ -93,7 +93,7 @@ public class EtcdHealthCheck extends KumuluzHealthCheck implements HealthCheck {
             }
         }
 
-        healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.State.DOWN.toString());
+        healthCheckResponseBuilder.withData(connectionUrl, HealthCheckResponse.Status.DOWN.toString());
         healthCheckResponseBuilder.down();
     }
 

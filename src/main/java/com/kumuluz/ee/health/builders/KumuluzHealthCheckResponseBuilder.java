@@ -39,7 +39,7 @@ public class KumuluzHealthCheckResponseBuilder extends HealthCheckResponseBuilde
 
     private String name;
     private Map<String, Object> data;
-    private HealthCheckResponse.State state;
+    private HealthCheckResponse.Status status;
 
     public KumuluzHealthCheckResponseBuilder() {
         this.data = new HashMap<>();
@@ -71,19 +71,19 @@ public class KumuluzHealthCheckResponseBuilder extends HealthCheckResponseBuilde
 
     @Override
     public HealthCheckResponseBuilder up() {
-        this.state = HealthCheckResponse.State.UP;
+        this.status = HealthCheckResponse.Status.UP;
         return this;
     }
 
     @Override
     public HealthCheckResponseBuilder down() {
-        this.state = HealthCheckResponse.State.DOWN;
+        this.status = HealthCheckResponse.Status.DOWN;
         return this;
     }
 
     @Override
-    public HealthCheckResponseBuilder state(boolean value) {
-        this.state = value ? HealthCheckResponse.State.UP : HealthCheckResponse.State.DOWN;
+    public HealthCheckResponseBuilder status(boolean value) {
+        this.status = value ? HealthCheckResponse.Status.UP : HealthCheckResponse.Status.DOWN;
         return this;
     }
 
@@ -101,8 +101,8 @@ public class KumuluzHealthCheckResponseBuilder extends HealthCheckResponseBuilde
 
         @JsonProperty("status")
         @Override
-        public HealthCheckResponse.State getState() {
-            return state;
+        public HealthCheckResponse.Status getStatus() {
+            return status;
         }
 
         @JsonInclude(JsonInclude.Include.NON_EMPTY)

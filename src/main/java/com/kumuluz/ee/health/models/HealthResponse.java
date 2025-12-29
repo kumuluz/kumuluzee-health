@@ -35,18 +35,18 @@ import java.util.List;
 @JsonInclude(Include.NON_NULL)
 public class HealthResponse {
 
-    private HealthCheckResponse.State status;
+    private HealthCheckResponse.Status status;
 
     private List<HealthCheckResponse> checks;
 
     public HealthResponse() {
     }
 
-    public HealthCheckResponse.State getStatus() {
+    public HealthCheckResponse.Status getStatus() {
         return status;
     }
 
-    public void setStatus(HealthCheckResponse.State status) {
+    public void setStatus(HealthCheckResponse.Status status) {
         this.status = status;
     }
 

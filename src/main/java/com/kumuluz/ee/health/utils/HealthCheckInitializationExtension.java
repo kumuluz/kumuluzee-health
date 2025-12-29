@@ -25,10 +25,10 @@ import com.kumuluz.ee.health.HealthRegistry;
 import com.kumuluz.ee.health.annotations.BuiltInHealthCheck;
 import com.kumuluz.ee.health.checks.KumuluzHealthCheck;
 import com.kumuluz.ee.health.enums.HealthCheckType;
-import org.eclipse.microprofile.health.Health;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.Liveness;
 import org.eclipse.microprofile.health.Readiness;
+import org.eclipse.microprofile.health.Startup;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
@@ -64,9 +64,8 @@ public class HealthCheckInitializationExtension implements Extension {
         }, HealthCheckType.LIVENESS);
         registerHealthCheckBeans(beanManager, new AnnotationLiteral<Readiness>() {
         }, HealthCheckType.READINESS);
-        //backwards compatible TBR
-        registerHealthCheckBeans(beanManager, new AnnotationLiteral<Health>() {
-        }, null);
+        registerHealthCheckBeans(beanManager, new AnnotationLiteral<Startup>() {
+        }, HealthCheckType.STARTUP);
     }
 
     private void registerHealthCheckBeans(BeanManager beanManager, AnnotationLiteral qualifier, HealthCheckType type) {

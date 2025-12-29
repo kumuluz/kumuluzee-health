@@ -95,7 +95,7 @@ public class HealthRegistry {
      */
     public List<HealthCheckResponse> getResults(HealthCheckType type) {
         return this.healthChecks.values().parallelStream()
-                .filter(hcw -> type.equals(HealthCheckType.BOTH) || type.equals(hcw.getType()) || (hcw.getType() == HealthCheckType.BOTH && (type == HealthCheckType.READINESS || type == HealthCheckType.LIVENESS)))
+                .filter(hcw -> type.equals(HealthCheckType.BOTH) || type.equals(hcw.getType()) || (hcw.getType() == HealthCheckType.BOTH && (type == HealthCheckType.READINESS || type == HealthCheckType.LIVENESS || type == HealthCheckType.STARTUP)))
                 .map(hcw -> hcw.getHealthCheck().call())
                 .collect(Collectors.toList());
     }
