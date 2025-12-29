@@ -30,7 +30,7 @@
 
         <microprofile-health.version>3.1</microprofile-health.version>
 
-        <jackson.version>2.12.0</jackson.version>
+        <jackson.version>2.15.0</jackson.version>
         <jedis.version>3.0.1</jedis.version>
         <mongo-driver.version>3.10.2</mongo-driver.version>
         <amqp-client.version>5.7.2</amqp-client.version>
