@@ -63,7 +63,7 @@ jobs:
 
       - name: Publish to OSSRH
         env:
-          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USER }}
-          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_PASSPHRASE }}
         run: mvn --batch-mode source:jar javadoc:jar deploy -Pdeploy -DskipTests=true --settings ./settings.xml;
